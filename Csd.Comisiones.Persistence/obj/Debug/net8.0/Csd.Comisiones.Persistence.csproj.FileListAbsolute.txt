@@ -1,0 +1,17 @@
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\obj\Debug\net8.0\Csd.Comisiones.Persistence.csproj.AssemblyReference.cache
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\obj\Debug\net8.0\Csd.Comisiones.Persistence.GeneratedMSBuildEditorConfig.editorconfig
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\obj\Debug\net8.0\Csd.Comisiones.Persistence.AssemblyInfoInputs.cache
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\obj\Debug\net8.0\Csd.Comisiones.Persistence.AssemblyInfo.cs
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\obj\Debug\net8.0\Csd.Comisiones.Persistence.csproj.CoreCompileInputs.cache
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\bin\Debug\net8.0\Csd.Comisiones.Persistence.deps.json
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\bin\Debug\net8.0\Csd.Comisiones.Persistence.dll
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\bin\Debug\net8.0\Csd.Comisiones.Persistence.pdb
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\bin\Debug\net8.0\Csd.Comisiones.Application.dll
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\bin\Debug\net8.0\Csd.Comisiones.Domain.dll
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\bin\Debug\net8.0\Csd.Comisiones.Application.pdb
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\bin\Debug\net8.0\Csd.Comisiones.Domain.pdb
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\obj\Debug\net8.0\Csd.Comi.717F80B1.Up2Date
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\obj\Debug\net8.0\Csd.Comisiones.Persistence.dll
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\obj\Debug\net8.0\refint\Csd.Comisiones.Persistence.dll
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\obj\Debug\net8.0\Csd.Comisiones.Persistence.pdb
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Persistence\obj\Debug\net8.0\ref\Csd.Comisiones.Persistence.dll

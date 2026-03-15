@@ -1,0 +1,6 @@
+@Csd.Comisiones.Api_HostAddress = http://localhost:5001
+
+GET {{Csd.Comisiones.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,17 @@
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\obj\Debug\net8.0\Csd.Comisiones.Infrastructure.csproj.AssemblyReference.cache
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\obj\Debug\net8.0\Csd.Comisiones.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\obj\Debug\net8.0\Csd.Comisiones.Infrastructure.AssemblyInfoInputs.cache
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\obj\Debug\net8.0\Csd.Comisiones.Infrastructure.AssemblyInfo.cs
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\obj\Debug\net8.0\Csd.Comisiones.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\bin\Debug\net8.0\Csd.Comisiones.Infrastructure.deps.json
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\bin\Debug\net8.0\Csd.Comisiones.Infrastructure.dll
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\bin\Debug\net8.0\Csd.Comisiones.Infrastructure.pdb
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\bin\Debug\net8.0\Csd.Comisiones.Application.dll
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\bin\Debug\net8.0\Csd.Comisiones.Domain.dll
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\bin\Debug\net8.0\Csd.Comisiones.Application.pdb
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\bin\Debug\net8.0\Csd.Comisiones.Domain.pdb
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\obj\Debug\net8.0\Csd.Comi.2A853D92.Up2Date
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\obj\Debug\net8.0\Csd.Comisiones.Infrastructure.dll
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\obj\Debug\net8.0\refint\Csd.Comisiones.Infrastructure.dll
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\obj\Debug\net8.0\Csd.Comisiones.Infrastructure.pdb
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Infrastructure\obj\Debug\net8.0\ref\Csd.Comisiones.Infrastructure.dll

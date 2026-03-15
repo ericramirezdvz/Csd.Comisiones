@@ -1,0 +1,92 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Repos\\CSD\\Csd.Comisiones.Solution\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{207CFB0A-A9FC-4073-B0AF-70D824D47175}|Csd.Comisiones.Application\\Csd.Comisiones.Application.csproj|c:\\repos\\csd\\csd.comisiones.solution\\csd.comisiones.application\\features\\solicitudes\\approvesolicitud\\aprobarsolicitudcommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{207CFB0A-A9FC-4073-B0AF-70D824D47175}|Csd.Comisiones.Application\\Csd.Comisiones.Application.csproj|solutionrelative:csd.comisiones.application\\features\\solicitudes\\approvesolicitud\\aprobarsolicitudcommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE50AFE3-50F9-406D-8EE8-74A542268E2E}|Csd.Comisiones.Api\\Csd.Comisiones.Api.csproj|c:\\repos\\csd\\csd.comisiones.solution\\csd.comisiones.api\\controllers\\solicitudescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE50AFE3-50F9-406D-8EE8-74A542268E2E}|Csd.Comisiones.Api\\Csd.Comisiones.Api.csproj|solutionrelative:csd.comisiones.api\\controllers\\solicitudescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{207CFB0A-A9FC-4073-B0AF-70D824D47175}|Csd.Comisiones.Application\\Csd.Comisiones.Application.csproj|c:\\repos\\csd\\csd.comisiones.solution\\csd.comisiones.application\\features\\solicitudes\\createsolicitud\\createsolicitudcommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{207CFB0A-A9FC-4073-B0AF-70D824D47175}|Csd.Comisiones.Application\\Csd.Comisiones.Application.csproj|solutionrelative:csd.comisiones.application\\features\\solicitudes\\createsolicitud\\createsolicitudcommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{207CFB0A-A9FC-4073-B0AF-70D824D47175}|Csd.Comisiones.Application\\Csd.Comisiones.Application.csproj|c:\\repos\\csd\\csd.comisiones.solution\\csd.comisiones.application\\features\\solicitudes\\approvesolicitud\\aprobarsolicitudcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{207CFB0A-A9FC-4073-B0AF-70D824D47175}|Csd.Comisiones.Application\\Csd.Comisiones.Application.csproj|solutionrelative:csd.comisiones.application\\features\\solicitudes\\approvesolicitud\\aprobarsolicitudcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SolicitudesController.cs",
+              "DocumentMoniker": "C:\\Repos\\CSD\\Csd.Comisiones.Solution\\Csd.Comisiones.Api\\Controllers\\SolicitudesController.cs",
+              "RelativeDocumentMoniker": "Csd.Comisiones.Api\\Controllers\\SolicitudesController.cs",
+              "ToolTip": "C:\\Repos\\CSD\\Csd.Comisiones.Solution\\Csd.Comisiones.Api\\Controllers\\SolicitudesController.cs",
+              "RelativeToolTip": "Csd.Comisiones.Api\\Controllers\\SolicitudesController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADQAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T23:02:38.897Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CreateSolicitudCommandHandler.cs",
+              "DocumentMoniker": "C:\\Repos\\CSD\\Csd.Comisiones.Solution\\Csd.Comisiones.Application\\Features\\Solicitudes\\CreateSolicitud\\CreateSolicitudCommandHandler.cs",
+              "RelativeDocumentMoniker": "Csd.Comisiones.Application\\Features\\Solicitudes\\CreateSolicitud\\CreateSolicitudCommandHandler.cs",
+              "ToolTip": "C:\\Repos\\CSD\\Csd.Comisiones.Solution\\Csd.Comisiones.Application\\Features\\Solicitudes\\CreateSolicitud\\CreateSolicitudCommandHandler.cs",
+              "RelativeToolTip": "Csd.Comisiones.Application\\Features\\Solicitudes\\CreateSolicitud\\CreateSolicitudCommandHandler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAABMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T22:57:49.576Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AprobarSolicitudCommandHandler.cs",
+              "DocumentMoniker": "C:\\Repos\\CSD\\Csd.Comisiones.Solution\\Csd.Comisiones.Application\\Features\\Solicitudes\\ApproveSolicitud\\AprobarSolicitudCommandHandler.cs",
+              "RelativeDocumentMoniker": "Csd.Comisiones.Application\\Features\\Solicitudes\\ApproveSolicitud\\AprobarSolicitudCommandHandler.cs",
+              "ToolTip": "C:\\Repos\\CSD\\Csd.Comisiones.Solution\\Csd.Comisiones.Application\\Features\\Solicitudes\\ApproveSolicitud\\AprobarSolicitudCommandHandler.cs",
+              "RelativeToolTip": "Csd.Comisiones.Application\\Features\\Solicitudes\\ApproveSolicitud\\AprobarSolicitudCommandHandler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwB4AAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T22:56:42.215Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AprobarSolicitudCommand.cs",
+              "DocumentMoniker": "C:\\Repos\\CSD\\Csd.Comisiones.Solution\\Csd.Comisiones.Application\\Features\\Solicitudes\\ApproveSolicitud\\AprobarSolicitudCommand.cs",
+              "RelativeDocumentMoniker": "Csd.Comisiones.Application\\Features\\Solicitudes\\ApproveSolicitud\\AprobarSolicitudCommand.cs",
+              "ToolTip": "C:\\Repos\\CSD\\Csd.Comisiones.Solution\\Csd.Comisiones.Application\\Features\\Solicitudes\\ApproveSolicitud\\AprobarSolicitudCommand.cs",
+              "RelativeToolTip": "Csd.Comisiones.Application\\Features\\Solicitudes\\ApproveSolicitud\\AprobarSolicitudCommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T22:05:44.543Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

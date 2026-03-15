@@ -1,0 +1,15 @@
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\obj\Debug\net8.0\Csd.Comisiones.Application.csproj.AssemblyReference.cache
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\obj\Debug\net8.0\Csd.Comisiones.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\obj\Debug\net8.0\Csd.Comisiones.Application.AssemblyInfoInputs.cache
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\obj\Debug\net8.0\Csd.Comisiones.Application.AssemblyInfo.cs
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\obj\Debug\net8.0\Csd.Comisiones.Application.csproj.CoreCompileInputs.cache
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\bin\Debug\net8.0\Csd.Comisiones.Application.deps.json
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\bin\Debug\net8.0\Csd.Comisiones.Application.dll
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\bin\Debug\net8.0\Csd.Comisiones.Application.pdb
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\bin\Debug\net8.0\Csd.Comisiones.Domain.dll
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\bin\Debug\net8.0\Csd.Comisiones.Domain.pdb
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\obj\Debug\net8.0\Csd.Comi.9B931799.Up2Date
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\obj\Debug\net8.0\Csd.Comisiones.Application.dll
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\obj\Debug\net8.0\refint\Csd.Comisiones.Application.dll
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\obj\Debug\net8.0\Csd.Comisiones.Application.pdb
+C:\Repos\CSD\Csd.Comisiones.Solution\Csd.Comisiones.Application\obj\Debug\net8.0\ref\Csd.Comisiones.Application.dll
