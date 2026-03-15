@@ -1,0 +1,14 @@
+*.suo
+/.vs
+/Csd.Comisiones.Api/bin
+/Csd.Comisiones.Api/obj
+/Csd.Comisiones.Application/bin
+/Csd.Comisiones.Application/obj
+/Csd.Comisiones.Domain/bin
+/Csd.Comisiones.Domain/obj
+/Csd.Comisiones.Infrastructure/bin
+/Csd.Comisiones.Infrastructure/obj
+/Csd.Comisiones.Persistence/bin
+/Csd.Comisiones.Persistence/obj
+
+
