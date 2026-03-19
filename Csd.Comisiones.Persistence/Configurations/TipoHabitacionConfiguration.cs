@@ -13,7 +13,7 @@ namespace Csd.Comisiones.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<TipoHabitacion> builder)
         {
-            builder.ToTable("TipsHabitacion");
+            builder.ToTable("TipoHabitacion");
 
             builder.HasKey(t => t.TipoHabitacionId);
 

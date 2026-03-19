@@ -9,6 +9,11 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
 {
     public interface IEmailService
     {
-        Task SendAsync(EmailMessage message);
+        Task SendSolicitudPendienteAsync(
+            string correo,
+            string folio,
+            string obra,
+            DateTime fechaInicio,
+            DateTime fechaFin);
     }
 }

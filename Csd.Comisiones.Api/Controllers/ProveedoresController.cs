@@ -7,11 +7,11 @@ namespace Csd.Comisiones.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProveedorController : ControllerBase
+    public class ProveedoresController : ControllerBase
     {
         private readonly IMediator _mediator;
 
-        public ProveedorController(IMediator mediator)
+        public ProveedoresController(IMediator mediator)
         {
             _mediator = mediator;
         }

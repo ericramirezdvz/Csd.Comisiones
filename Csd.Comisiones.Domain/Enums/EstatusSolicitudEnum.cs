@@ -9,11 +9,14 @@ namespace Csd.Comisiones.Domain.Enums
     public enum EstatusSolicitudEnum
     {
         Borrador = 1,
-        Enviada = 2,
-        EnRevision = 3,
-        Autorizada = 4,
-        Rechazada = 5,
-        Parcial = 6,
-        Cancelada = 7
+        EnAutorizaciónPorResponsableDeObra = 2,
+        AutorizadaPorResposableDeObra = 3,
+        EnAutorizacionPorPermisos = 4,
+        AutorizadaPorPermisos = 5,
+        Asignada = 6,
+        EnProceso = 7,
+        Terminada = 8,
+        Rechazada = 9,
+        Cancelada = 10
     }
 }

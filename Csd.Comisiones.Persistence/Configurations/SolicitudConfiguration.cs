@@ -36,6 +36,23 @@ namespace Csd.Comisiones.Persistence.Configurations
             builder.Property(x => x.EstatusSolicitudId)
                 .IsRequired();
 
+            builder.Property(x => x.Comentarios)
+                .HasMaxLength(500);
+
+            // RELACIÓN CON AREA
+            builder
+                .HasOne(x => x.Area)
+                .WithMany()
+                .HasForeignKey(x => x.AreaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // RELACIÓN CON OBRA
+            builder
+                .HasOne(x => x.Obra)
+                .WithMany()
+                .HasForeignKey(x => x.ObraId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // RELACIÓN CON ESTATUS
             builder
                 .HasOne(x => x.Estatus)

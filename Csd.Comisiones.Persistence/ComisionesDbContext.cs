@@ -1,6 +1,7 @@
 ﻿using Csd.Comisiones.Application.Contracts.Persistence;
 using Csd.Comisiones.Domain.Common;
 using Csd.Comisiones.Domain.Entities;
+using Csd.Comisiones.Persistence.Seeds;
 using Microsoft.EntityFrameworkCore;
 
 namespace Csd.Comisiones.Persistence
@@ -24,12 +25,20 @@ namespace Csd.Comisiones.Persistence
         public DbSet<SolicitudHotel> SolicitudHotel { get; set; }
         public DbSet<TipoComida> TipoComida { get; set; }
         public DbSet<TipoHabitacion> TipoHabitacion { get; set; }
+        public DbSet<SolicitudSeguimiento> SolicitudSeguimiento { get; set; }
+        public DbSet<Obra> Obra { get; set; }
+        public DbSet<Area> Area { get; set; }
+        public DbSet<Autorizador> Autorizador { get; set; }
+        public DbSet<SolicitudAutorizacion> SolicitudAutorizacion { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ComisionesDbContext).Assembly);
+
+            //EstatusSolicitudSeed.Seed(modelBuilder);
+            //EstatusDetalleSeed.Seed(modelBuilder);
 
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {

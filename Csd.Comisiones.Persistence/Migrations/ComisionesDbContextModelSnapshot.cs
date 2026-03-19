@@ -22,6 +22,96 @@ namespace Csd.Comisiones.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Csd.Comisiones.Domain.Entities.Area", b =>
+                {
+                    b.Property<int>("AreaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AreaId"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CreadoPor")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("FechaModificacion")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("ModificadoPor")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("AreaId");
+
+                    b.HasIndex("Nombre")
+                        .IsUnique();
+
+                    b.ToTable("Area", (string)null);
+                });
+
+            modelBuilder.Entity("Csd.Comisiones.Domain.Entities.Autorizador", b =>
+                {
+                    b.Property<int>("AutorizadorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AutorizadorId"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CreadoPor")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("EmpleadoId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("EsAlterno")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("FechaModificacion")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("ModificadoPor")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Nivel")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ObraId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AutorizadorId");
+
+                    b.HasIndex("EmpleadoId");
+
+                    b.HasIndex("ObraId");
+
+                    b.ToTable("Autorizador", (string)null);
+                });
+
             modelBuilder.Entity("Csd.Comisiones.Domain.Entities.Ciudad", b =>
                 {
                     b.Property<int>("CiudadId")
@@ -198,6 +288,49 @@ namespace Csd.Comisiones.Persistence.Migrations
                     b.ToTable("EstatusSolicitud", (string)null);
                 });
 
+            modelBuilder.Entity("Csd.Comisiones.Domain.Entities.Obra", b =>
+                {
+                    b.Property<int>("ObraId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ObraId"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CreadoPor")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("FechaModificacion")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("ModificadoPor")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("ObraId");
+
+                    b.HasIndex("Nombre")
+                        .IsUnique();
+
+                    b.ToTable("Obra", (string)null);
+                });
+
             modelBuilder.Entity("Csd.Comisiones.Domain.Entities.Proveedor", b =>
                 {
                     b.Property<int>("ProveedorId")
@@ -262,6 +395,10 @@ namespace Csd.Comisiones.Persistence.Migrations
                     b.Property<int>("AreaId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Comentarios")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("CreadoPor")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -291,14 +428,69 @@ namespace Csd.Comisiones.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int>("ObraId")
+                        .HasColumnType("int");
+
                     b.Property<int>("SolicitanteId")
                         .HasColumnType("int");
 
                     b.HasKey("SolicitudId");
 
+                    b.HasIndex("AreaId");
+
                     b.HasIndex("EstatusSolicitudId");
 
+                    b.HasIndex("ObraId");
+
                     b.ToTable("Solicitud", (string)null);
+                });
+
+            modelBuilder.Entity("Csd.Comisiones.Domain.Entities.SolicitudAutorizacion", b =>
+                {
+                    b.Property<int>("SolicitudAutorizacionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SolicitudAutorizacionId"));
+
+                    b.Property<int>("AutorizadorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comentarios")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("CreadoPor")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("EstatusAutorizacionId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("FechaModificacion")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("FechaRespuesta")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModificadoPor")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("SolicitudId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SolicitudAutorizacionId");
+
+                    b.HasIndex("AutorizadorId");
+
+                    b.HasIndex("SolicitudId");
+
+                    b.ToTable("SolicitudAutorizacion", (string)null);
                 });
 
             modelBuilder.Entity("Csd.Comisiones.Domain.Entities.SolicitudComida", b =>
@@ -462,6 +654,51 @@ namespace Csd.Comisiones.Persistence.Migrations
                     b.ToTable("SolicitudHotel", (string)null);
                 });
 
+            modelBuilder.Entity("Csd.Comisiones.Domain.Entities.SolicitudSeguimiento", b =>
+                {
+                    b.Property<int>("SolicitudSeguimientoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SolicitudSeguimientoId"));
+
+                    b.Property<string>("Comentarios")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("CreadoPor")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("EstatusSolicitudId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("FechaModificacion")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("ModificadoPor")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("SolicitudId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SolicitudSeguimientoId");
+
+                    b.HasIndex("EstatusSolicitudId");
+
+                    b.HasIndex("SolicitudId");
+
+                    b.ToTable("SolicitudSeguimiento", (string)null);
+                });
+
             modelBuilder.Entity("Csd.Comisiones.Domain.Entities.TipoComida", b =>
                 {
                     b.Property<int>("TipoComidaId")
@@ -498,7 +735,7 @@ namespace Csd.Comisiones.Persistence.Migrations
                     b.HasIndex("Nombre")
                         .IsUnique();
 
-                    b.ToTable("TiposComida", (string)null);
+                    b.ToTable("TipoComida", (string)null);
                 });
 
             modelBuilder.Entity("Csd.Comisiones.Domain.Entities.TipoHabitacion", b =>
@@ -537,7 +774,22 @@ namespace Csd.Comisiones.Persistence.Migrations
                     b.HasIndex("Nombre")
                         .IsUnique();
 
-                    b.ToTable("TipsHabitacion", (string)null);
+                    b.ToTable("TipoHabitacion", (string)null);
+                });
+
+            modelBuilder.Entity("Csd.Comisiones.Domain.Entities.Autorizador", b =>
+                {
+                    b.HasOne("Csd.Comisiones.Domain.Entities.Empleado", null)
+                        .WithMany()
+                        .HasForeignKey("EmpleadoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Csd.Comisiones.Domain.Entities.Obra", null)
+                        .WithMany()
+                        .HasForeignKey("ObraId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Csd.Comisiones.Domain.Entities.Proveedor", b =>
@@ -551,13 +803,48 @@ namespace Csd.Comisiones.Persistence.Migrations
 
             modelBuilder.Entity("Csd.Comisiones.Domain.Entities.Solicitud", b =>
                 {
+                    b.HasOne("Csd.Comisiones.Domain.Entities.Area", "Area")
+                        .WithMany()
+                        .HasForeignKey("AreaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Csd.Comisiones.Domain.Entities.EstatusSolicitud", "Estatus")
                         .WithMany()
                         .HasForeignKey("EstatusSolicitudId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Csd.Comisiones.Domain.Entities.Obra", "Obra")
+                        .WithMany()
+                        .HasForeignKey("ObraId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Area");
+
                     b.Navigation("Estatus");
+
+                    b.Navigation("Obra");
+                });
+
+            modelBuilder.Entity("Csd.Comisiones.Domain.Entities.SolicitudAutorizacion", b =>
+                {
+                    b.HasOne("Csd.Comisiones.Domain.Entities.Autorizador", "Autorizador")
+                        .WithMany("Autorizaciones")
+                        .HasForeignKey("AutorizadorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Csd.Comisiones.Domain.Entities.Solicitud", "Solicitud")
+                        .WithMany("Autorizaciones")
+                        .HasForeignKey("SolicitudId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Autorizador");
+
+                    b.Navigation("Solicitud");
                 });
 
             modelBuilder.Entity("Csd.Comisiones.Domain.Entities.SolicitudComida", b =>
@@ -647,9 +934,37 @@ namespace Csd.Comisiones.Persistence.Migrations
                     b.Navigation("SolicitudEmpleado");
                 });
 
+            modelBuilder.Entity("Csd.Comisiones.Domain.Entities.SolicitudSeguimiento", b =>
+                {
+                    b.HasOne("Csd.Comisiones.Domain.Entities.EstatusSolicitud", "Estatus")
+                        .WithMany()
+                        .HasForeignKey("EstatusSolicitudId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Csd.Comisiones.Domain.Entities.Solicitud", "Solicitud")
+                        .WithMany("Seguimientos")
+                        .HasForeignKey("SolicitudId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Estatus");
+
+                    b.Navigation("Solicitud");
+                });
+
+            modelBuilder.Entity("Csd.Comisiones.Domain.Entities.Autorizador", b =>
+                {
+                    b.Navigation("Autorizaciones");
+                });
+
             modelBuilder.Entity("Csd.Comisiones.Domain.Entities.Solicitud", b =>
                 {
+                    b.Navigation("Autorizaciones");
+
                     b.Navigation("Empleados");
+
+                    b.Navigation("Seguimientos");
                 });
 
             modelBuilder.Entity("Csd.Comisiones.Domain.Entities.SolicitudEmpleado", b =>

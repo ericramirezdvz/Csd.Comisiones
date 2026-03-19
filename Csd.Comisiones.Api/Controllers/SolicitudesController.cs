@@ -2,6 +2,7 @@
 using Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud;
 using Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById;
 using Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudes;
+using Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -47,10 +48,32 @@ namespace Csd.Comisiones.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPost("{id}/aprobar")]
-        public async Task<IActionResult> Aprobar(int id)
+        [HttpPost("{id}/approve")]
+        public async Task<IActionResult> Approve(int id)
         {
             await _mediator.Send(new AprobarSolicitudCommand
+            {
+                SolicitudId = id
+            });
+
+            return NoContent();
+        }
+
+        [HttpPost("{id}/send")]
+        public async Task<IActionResult> Send(int id)
+        {
+            await _mediator.Send(new EnviarSolicitudCommand
+            {
+                SolicitudId = id
+            });
+
+            return NoContent();
+        }
+
+        [HttpPost("{id}/reject")]
+        public async Task<IActionResult> Rechazar(int id)
+        {
+            await _mediator.Send(new EnviarSolicitudCommand
             {
                 SolicitudId = id
             });

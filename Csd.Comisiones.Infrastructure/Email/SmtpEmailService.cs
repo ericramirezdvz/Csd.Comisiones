@@ -17,41 +17,42 @@ namespace Csd.Comisiones.Infrastructure.Email
             _settings = settings.Value;
         }
 
-        public async Task SendAsync(EmailMessage message)
+        public async Task SendSolicitudPendienteAsync(
+        string correo,
+        string folio,
+        string obra,
+        DateTime fechaInicio,
+        DateTime fechaFin)
         {
+            var template = EmailTemplateHelper.LoadTemplate("SolicitudPendiente.html");
+
+            var body = EmailTemplateHelper.Replace(template, new Dictionary<string, string>
+        {
+            { "Folio", folio },
+            { "Obra", obra },
+            { "FechaInicio", fechaInicio.ToString("dd/MM/yyyy") },
+            { "FechaFin", fechaFin.ToString("dd/MM/yyyy") }
+        });
+
             var email = new MimeMessage();
 
-            email.From.Add(new MailboxAddress(
-                _settings.SenderName,
-                _settings.SenderEmail));
-
-            foreach (var to in message.To)
-            {
-                email.To.Add(MailboxAddress.Parse(to));
-            }
-
-            email.Subject = message.Subject;
+            email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
+            email.To.Add(MailboxAddress.Parse(correo));
+            email.Subject = "Solicitud pendiente de autorización";
 
             var builder = new BodyBuilder
             {
-                HtmlBody = message.IsHtml ? message.Body : null,
-                TextBody = message.IsHtml ? null : message.Body
+                HtmlBody = body
             };
 
             email.Body = builder.ToMessageBody();
 
             using var smtp = new SmtpClient();
 
-            await smtp.ConnectAsync(
-                _settings.Server,
-                _settings.Port,
-                _settings.UseSSL ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto
-            );
+            await smtp.ConnectAsync(_settings.Server, _settings.Port,
+                _settings.UseSSL ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto);
 
-            await smtp.AuthenticateAsync(
-                _settings.Username,
-                _settings.Password
-            );
+            await smtp.AuthenticateAsync(_settings.Username, _settings.Password);
 
             await smtp.SendAsync(email);
 

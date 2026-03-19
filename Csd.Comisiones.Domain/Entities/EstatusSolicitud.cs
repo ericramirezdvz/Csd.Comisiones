@@ -24,5 +24,27 @@ namespace Csd.Comisiones.Domain.Entities
             Descripcion = descripcion;
             Activo = true;
         }
+
+        private EstatusSolicitud(
+        int id,
+        string nombre,
+        string descripcion,
+        bool activo)
+        {
+            EstatusSolicitudId = id;
+            Nombre = nombre;
+            Descripcion = descripcion;
+            Activo = activo;
+            FechaCreacion = DateTime.UtcNow;
+            CreadoPor = "System";
+        }
+
+        public static EstatusSolicitud Seed(
+        int id,
+        string nombre,
+        string descripcion)
+        {
+            return new EstatusSolicitud(id, nombre, descripcion, true);
+        }
     }
 }

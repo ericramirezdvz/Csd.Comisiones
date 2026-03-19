@@ -25,4 +25,10 @@
     <ProjectReference Include="..\Csd.Comisiones.Persistence\Csd.Comisiones.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+  	<Content Include="Templates\**\*">
+  		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  	</Content>
+  </ItemGroup>
+
 </Project>

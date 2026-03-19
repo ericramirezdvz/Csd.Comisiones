@@ -1,4 +1,5 @@
 ﻿using Csd.Comisiones.Application.Contracts.Persistence;
+using Csd.Comisiones.Domain.Enums;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -19,14 +20,16 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.ApproveSolicitud
 
         public async Task<bool> Handle(AprobarSolicitudCommand request, CancellationToken cancellationToken)
         {
-            var solicitud = _solicitudRepository.GetByIdAsync(request.SolicitudId).Result;
+            var solicitud = await _solicitudRepository.GetByIdAsync(request.SolicitudId);
 
             if(solicitud == null)
                 throw new Exception("Solicitud no encontrada");
 
-            solicitud.CambiarEstatus(Domain.Enums.EstatusSolicitudEnum.Autorizada);
+            solicitud.CambiarEstatus(EstatusSolicitudEnum.Terminada);
 
             await _solicitudRepository.UpdateAsync(solicitud);
+
+            await _solicitudRepository.SaveChangesAsync(cancellationToken);
 
             return true;
         }

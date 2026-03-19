@@ -23,9 +23,11 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud
             var solicitud = new Solicitud(
             request.Folio,
             request.AreaId,
+            request.ObraId,
             request.SolicitanteId,
             request.FechaInicio,
-            request.FechaFin);
+            request.FechaFin,
+            request.Comentarios);
 
             foreach (var empleadoDto in request.Empleados)
             {

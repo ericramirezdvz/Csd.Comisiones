@@ -1,4 +1,5 @@
 ﻿using Csd.Comisiones.Domain.Common;
+using Csd.Comisiones.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,12 +54,12 @@ namespace Csd.Comisiones.Domain.Entities
             FechaFin = fechaFin;
             PrecioUnitario = precioUnitario;
 
-            EstatusDetalleId = 1; // Activo
+            EstatusDetalleId = (int)EstatusDetalleEnum.Borrador; // Activo
         }
 
         public void Cancelar()
         {
-            EstatusDetalleId = 2; // Cancelado
+            EstatusDetalleId = (int)EstatusDetalleEnum.Cancelada; // Cancelado
         }
     }
 }
