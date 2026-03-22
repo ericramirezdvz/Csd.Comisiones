@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Csd.Comisiones.Application.Features.Empleados.GetEmpleados
 {
-    public class GetEmpleadoQuery : IRequest<PagedResult<EmpleadoDto>>
+    public class GetEmpleadosQuery : IRequest<PagedResult<EmpleadoDto>>
     {
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;

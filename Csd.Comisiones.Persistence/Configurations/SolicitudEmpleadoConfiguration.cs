@@ -37,7 +37,7 @@ namespace Csd.Comisiones.Persistence.Configurations
                 .HasOne(x => x.Empleado)
                 .WithMany()
                 .HasForeignKey(x => x.EmpleadoId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

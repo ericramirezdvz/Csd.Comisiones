@@ -11,15 +11,15 @@ using System.Threading.Tasks;
 
 namespace Csd.Comisiones.Application.Features.Empleados.GetEmpleados
 {
-    public class GetEmpleadoQueryHandler : IRequestHandler<GetEmpleadoQuery, PagedResult<EmpleadoDto>>
+    public class GetEmpleadosQueryHandler : IRequestHandler<GetEmpleadosQuery, PagedResult<EmpleadoDto>>
     {
         private readonly IApplicationDbContext _context;
 
-        public GetEmpleadoQueryHandler(IApplicationDbContext context)
+        public GetEmpleadosQueryHandler(IApplicationDbContext context)
         {
             _context = context;
         }
-        public async Task<PagedResult<EmpleadoDto>> Handle(GetEmpleadoQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResult<EmpleadoDto>> Handle(GetEmpleadosQuery request, CancellationToken cancellationToken)
         {
             var query = _context.Empleado
                 .AsNoTracking()

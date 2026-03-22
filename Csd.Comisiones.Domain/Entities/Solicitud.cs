@@ -93,5 +93,33 @@ namespace Csd.Comisiones.Domain.Entities
 
             _seguimientos.Add(seguimiento);
         }
+
+        public void Actualizar(
+            int areaId,
+            int obraId,
+            DateTime fechaInicio,
+            DateTime fechaFin,
+            string? comentarios)
+        {
+            if (EstatusSolicitudId != (int)EstatusSolicitudEnum.Borrador)
+                throw new InvalidOperationException("Solo se puede editar en estatus Borrador");
+
+            if (fechaFin < fechaInicio)
+                throw new ArgumentException("La fecha fin no puede ser menor a la fecha inicio.");
+
+            AreaId = areaId;
+            ObraId = obraId;
+            FechaInicio = fechaInicio;
+            FechaFin = fechaFin;
+            Comentarios = comentarios;
+        }
+
+        public void LimpiarEmpleados()
+        {
+            if (EstatusSolicitudId != (int)EstatusSolicitudEnum.Borrador)
+                throw new InvalidOperationException("Solo se puede editar en estatus Borrador");
+
+            _empleados.Clear();
+        }
     }
 }

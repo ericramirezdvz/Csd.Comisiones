@@ -1,5 +1,6 @@
 ﻿using Csd.Comisiones.Application.Common.Models;
 using Csd.Comisiones.Application.Contracts.Infrastructure;
+using Csd.Comisiones.Domain.Entities;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
@@ -25,13 +26,17 @@ namespace Csd.Comisiones.Infrastructure.Email
         DateTime fechaFin)
         {
             var template = EmailTemplateHelper.LoadTemplate("SolicitudPendiente.html");
+            var urlAprobar = $"https://localhost/api/solicitudes/aprobar";
+            var urlRechazar = $"https://locahost/api/solicitudes/rechazar";
 
             var body = EmailTemplateHelper.Replace(template, new Dictionary<string, string>
         {
             { "Folio", folio },
             { "Obra", obra },
             { "FechaInicio", fechaInicio.ToString("dd/MM/yyyy") },
-            { "FechaFin", fechaFin.ToString("dd/MM/yyyy") }
+            { "FechaFin", fechaFin.ToString("dd/MM/yyyy") },
+            { "UrlAprobar", urlAprobar },
+            { "UrlRechazar", urlRechazar }
         });
 
             var email = new MimeMessage();

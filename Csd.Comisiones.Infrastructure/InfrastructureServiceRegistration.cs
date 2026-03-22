@@ -1,5 +1,6 @@
 ﻿using Csd.Comisiones.Application.Contracts.Infrastructure;
 using Csd.Comisiones.Infrastructure.Email;
+using Csd.Comisiones.Infrastructure.Files;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -21,6 +22,7 @@ namespace Csd.Comisiones.Infrastructure
                 configuration.GetSection("SmtpSettings"));
 
             services.AddTransient<IEmailService, SmtpEmailService>();
+            services.AddTransient<IFileParserService, FileParserService>();
 
             return services;
         }

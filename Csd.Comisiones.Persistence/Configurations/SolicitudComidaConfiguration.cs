@@ -32,7 +32,7 @@ namespace Csd.Comisiones.Persistence.Configurations
                 .HasOne(x => x.SolicitudEmpleado)
                 .WithMany(x => x.Comidas)
                 .HasForeignKey(x => x.SolicitudEmpleadoId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder
                 .HasOne(x => x.TipoComida)

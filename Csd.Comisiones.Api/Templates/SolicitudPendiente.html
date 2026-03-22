@@ -1,28 +1,38 @@
 ﻿<!DOCT<html>
-<body style="font-family: Arial;">
+      <body style="font-family: Arial;">
 
-    <h2>Solicitud pendiente de autorización</h2>
+          <h2>Solicitud pendiente de autorización</h2>
 
-    <p>Hola,</p>
+          <p>Hola,</p>
 
-    <p>
-        Tienes una solicitud pendiente de autorización.
-    </p>
+          <p>
+              Tienes una solicitud pendiente de autorización.
+          </p>
 
-    <p>
-        <strong>Folio:</strong> {{Folio}} <br/>
-        <strong>Obra:</strong> {{Obra}} <br/>
-        <strong>Fecha inicio:</strong> {{FechaInicio}} <br/>
-        <strong>Fecha fin:</strong> {{FechaFin}}
-    </p>
+          <p>
+              <strong>Folio:</strong> {{Folio}} <br />
+              <strong>Obra:</strong> {{Obra}} <br />
+              <strong>Fecha inicio:</strong> {{FechaInicio}} <br />
+              <strong>Fecha fin:</strong> {{FechaFin}}
+          </p>
 
-    <p>
-        Por favor ingresa al sistema para aprobar o rechazar.
-    </p>
+          <p>Selecciona una acción:</p>
 
-    <br/>
+          <a href="{{UrlAprobar}}"
+             style="background-color: #28a745; color: white; padding: 10px 20px;
+           text-decoration: none; border-radius: 5px; margin-right: 10px;">
+              Aprobar
+          </a>
 
-    <p>Saludos.</p>
+          <a href="{{UrlRechazar}}"
+             style="background-color: #dc3545; color: white; padding: 10px 20px;
+           text-decoration: none; border-radius: 5px;">
+              Rechazar
+          </a>
 
-</body>
+          <br />
+
+          <p>Saludos.</p>
+
+      </body>
 </html>
