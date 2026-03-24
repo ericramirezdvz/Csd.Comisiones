@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Csd.Comisiones.Persistence.Migrations
 {
     [DbContext(typeof(ComisionesDbContext))]
-    [Migration("20260319162444_InitialCreate_Migration")]
-    partial class InitialCreate_Migration
+    [Migration("20260324160337_Initial_Create")]
+    partial class Initial_Create
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -867,7 +867,7 @@ namespace Csd.Comisiones.Persistence.Migrations
                     b.HasOne("Csd.Comisiones.Domain.Entities.SolicitudEmpleado", "SolicitudEmpleado")
                         .WithMany("Comidas")
                         .HasForeignKey("SolicitudEmpleadoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Csd.Comisiones.Domain.Entities.TipoComida", "TipoComida")
@@ -890,7 +890,7 @@ namespace Csd.Comisiones.Persistence.Migrations
                     b.HasOne("Csd.Comisiones.Domain.Entities.Empleado", "Empleado")
                         .WithMany()
                         .HasForeignKey("EmpleadoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Csd.Comisiones.Domain.Entities.Solicitud", "Solicitud")
@@ -921,7 +921,7 @@ namespace Csd.Comisiones.Persistence.Migrations
                     b.HasOne("Csd.Comisiones.Domain.Entities.SolicitudEmpleado", "SolicitudEmpleado")
                         .WithMany("Hoteles")
                         .HasForeignKey("SolicitudEmpleadoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Csd.Comisiones.Domain.Entities.TipoHabitacion", null)

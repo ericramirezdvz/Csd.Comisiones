@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Csd.Comisiones.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate_Migration : Migration
+    public partial class Initial_Create : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -321,7 +321,7 @@ namespace Csd.Comisiones.Persistence.Migrations
                         column: x => x.EmpleadoId,
                         principalTable: "Empleado",
                         principalColumn: "EmpleadoId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_SolicitudEmpleado_Solicitud_SolicitudId",
                         column: x => x.SolicitudId,
@@ -401,7 +401,7 @@ namespace Csd.Comisiones.Persistence.Migrations
                         column: x => x.SolicitudEmpleadoId,
                         principalTable: "SolicitudEmpleado",
                         principalColumn: "SolicitudEmpleadoId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_SolicitudComida_TipoComida_TipoComidaId",
                         column: x => x.TipoComidaId,
@@ -448,7 +448,7 @@ namespace Csd.Comisiones.Persistence.Migrations
                         column: x => x.SolicitudEmpleadoId,
                         principalTable: "SolicitudEmpleado",
                         principalColumn: "SolicitudEmpleadoId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_SolicitudHotel_TipoHabitacion_TipoHabitacionId",
                         column: x => x.TipoHabitacionId,
