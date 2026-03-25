@@ -25,7 +25,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.ApproveSolicitud
             if(solicitud == null)
                 throw new Exception("Solicitud no encontrada");
 
-            solicitud.CambiarEstatus(EstatusSolicitudEnum.Terminada);
+            solicitud.Aprobar();
 
             await _solicitudRepository.UpdateAsync(solicitud);
 
