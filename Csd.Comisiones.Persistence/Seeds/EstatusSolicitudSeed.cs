@@ -16,7 +16,7 @@ namespace Csd.Comisiones.Persistence.Seeds
             modelBuilder.Entity<EstatusSolicitud>().HasData(
                 EstatusSolicitud.Seed((int)EstatusSolicitudEnum.Borrador, "Borrador", "Solicitud en edición"),                
                 EstatusSolicitud.Seed((int)EstatusSolicitudEnum.EnAutorizaciónPorResponsableDeObra, "En Autorización por Responsable de Obra", "Solicitud enviada al responsable de obra"),
-                EstatusSolicitud.Seed((int)EstatusSolicitudEnum.AutorizadaPorResposableDeObra, "Autorizada por Resposable de Obra", "Solicitud autorizada por el responsable de obra"),                
+                EstatusSolicitud.Seed((int)EstatusSolicitudEnum.AutorizadaPorResponsableDeObra, "Autorizada por Resposable de Obra", "Solicitud autorizada por el responsable de obra"),                
                 EstatusSolicitud.Seed((int)EstatusSolicitudEnum.EnProceso, "En Proceso", "Solicitud en proceso de atención"),
                 EstatusSolicitud.Seed((int)EstatusSolicitudEnum.Terminada, "Terminada", "Solicitud terminada"),
                 EstatusSolicitud.Seed((int)EstatusSolicitudEnum.Rechazada, "Rechazada", "Solicitud rechazada"),
