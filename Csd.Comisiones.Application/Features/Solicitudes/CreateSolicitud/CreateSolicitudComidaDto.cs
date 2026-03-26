@@ -10,7 +10,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud
     {
         public int TipoComidaId { get; set; }
 
-        public int ProveedorId { get; set; }
+        public int? ProveedorId { get; set; }
 
         public int UbicacionId { get; set; }
 

@@ -45,6 +45,7 @@ namespace Csd.Comisiones.Persistence.Configurations
                 .HasOne(x => x.EstatusDetalle)
                 .WithMany()
                 .HasForeignKey(x => x.EstatusDetalleId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Relación con TipoHabitacion
