@@ -9,7 +9,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById
     public class ComidaSolicitudDto
     {
         public int SolicitudComidaId { get; set; }
-        public int ProveedorId { get; set; }
+        public int? ProveedorId { get; set; }
         public int TipoComidaId { get; set; }
         public int UbicacionId { get; set; }
         public DateTime FechaInicio { get; set; }

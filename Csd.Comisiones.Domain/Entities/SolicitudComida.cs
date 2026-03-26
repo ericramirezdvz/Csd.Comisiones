@@ -16,7 +16,7 @@ namespace Csd.Comisiones.Domain.Entities
 
         public int TipoComidaId { get; private set; }
 
-        public int ProveedorId { get; private set; }
+        public int? ProveedorId { get; private set; }
 
         public int UbicacionId { get; private set; }
 
@@ -38,7 +38,7 @@ namespace Csd.Comisiones.Domain.Entities
 
         public SolicitudComida(
             int tipoComidaId,
-            int proveedorId,
+            int? proveedorId,
             int ubicacionId,
             DateTime fechaInicio,
             DateTime fechaFin,
@@ -55,6 +55,14 @@ namespace Csd.Comisiones.Domain.Entities
             PrecioUnitario = precioUnitario;
 
             EstatusDetalleId = (int)EstatusDetalleEnum.Borrador; // Activo
+        }
+
+        public void AsignarProveedor(int proveedorId)
+        {
+            if (EstatusDetalleId == (int)EstatusDetalleEnum.Cancelada)
+                throw new InvalidOperationException("No se puede asignar proveedor a un servicio cancelado");
+
+            ProveedorId = proveedorId;
         }
 
         public void Cancelar()

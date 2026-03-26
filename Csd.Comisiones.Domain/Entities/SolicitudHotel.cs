@@ -1,4 +1,5 @@
 ﻿using Csd.Comisiones.Domain.Common;
+using Csd.Comisiones.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace Csd.Comisiones.Domain.Entities
 
         public int SolicitudEmpleadoId { get; private set; }
 
-        public int ProveedorId { get; private set; }
+        public int? ProveedorId { get; private set; }
 
         public int TipoHabitacionId { get; private set; }
 
@@ -34,7 +35,7 @@ namespace Csd.Comisiones.Domain.Entities
         private SolicitudHotel() { }
 
         public SolicitudHotel(
-            int hotelId,
+            int? hotelId,
             int tipoHabitacionId,
             DateTime fechaInicio,
             DateTime fechaFin,
@@ -50,6 +51,13 @@ namespace Csd.Comisiones.Domain.Entities
             PrecioUnitario = precioUnitario;
 
             EstatusDetalleId = 1; // Activo
+        }
+        public void AsignarProveedor(int proveedorId)
+        {
+            if (EstatusDetalleId == (int)EstatusDetalleEnum.Cancelada)
+                throw new InvalidOperationException("No se puede asignar proveedor a un servicio cancelado");
+
+            ProveedorId = proveedorId;
         }
 
         public void Cancelar()

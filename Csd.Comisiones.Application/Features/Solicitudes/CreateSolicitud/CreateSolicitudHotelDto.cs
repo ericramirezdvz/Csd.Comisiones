@@ -8,7 +8,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud
 {
     public class CreateSolicitudHotelDto
     {
-        public int ProveedorId { get; set; }
+        public int? ProveedorId { get; set; }
 
         public int TipoHabitacionId { get; set; }
 

@@ -44,6 +44,7 @@ namespace Csd.Comisiones.Persistence.Configurations
                 .HasOne(x => x.Proveedor)
                 .WithMany()
                 .HasForeignKey(x => x.ProveedorId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Relación con EstatusDetalle
