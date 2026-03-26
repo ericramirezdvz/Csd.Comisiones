@@ -49,7 +49,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
             foreach (var autorizador in autorizadores)
             {
                 var autorizacion = new SolicitudAutorizacion(
-                    solicitudId: 0,
+                    solicitudId: solicitud.SolicitudId,
                     autorizadorId: autorizador.AutorizadorId
                 );
 
@@ -57,20 +57,28 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
             }
 
             // Cambiar estatus
-            solicitud.CambiarEstatus(EstatusSolicitudEnum.EnAutorizaciónPorResponsableDeObra);
+            solicitud.Enviar();
 
             await _solicitudRepository.UpdateAsync(solicitud);
             await _solicitudRepository.SaveChangesAsync(cancellationToken);
 
+            var empleados = await _context.Empleado
+                .Where(e => autorizadores
+                    .Select(a => a.EmpleadoId)
+                    .Contains(e.EmpleadoId))
+                .Select(e => new { e.EmpleadoId, e.Correo })
+                .ToListAsync(cancellationToken);
+
+            var empleadosDict = empleados
+                .Where(e => !string.IsNullOrEmpty(e.Correo))
+                .ToDictionary(e => e.EmpleadoId, e => e.Correo!);
+
             foreach (var autorizador in autorizadores)
             {
-                var empleado = await _context.Empleado
-                    .FirstOrDefaultAsync(e => e.EmpleadoId == autorizador.EmpleadoId, cancellationToken);
-
-                if (empleado?.Correo != null)
+                if (empleadosDict.TryGetValue(autorizador.EmpleadoId, out var correo))
                 {
                     await _emailService.SendSolicitudPendienteAsync(
-                        empleado.Correo,
+                        correo,
                         solicitud.Folio,
                         solicitud.ObraId.ToString(),
                         solicitud.FechaInicio,

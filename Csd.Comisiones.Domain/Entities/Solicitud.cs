@@ -73,7 +73,7 @@ namespace Csd.Comisiones.Domain.Entities
             _empleados.Add(empleado);
         }
 
-        public void CambiarEstatus(EstatusSolicitudEnum nuevoEstatus)
+        private void CambiarEstatus(EstatusSolicitudEnum nuevoEstatus)
         {
             EstatusSolicitudId = (int)nuevoEstatus;
 
@@ -120,6 +120,83 @@ namespace Csd.Comisiones.Domain.Entities
                 throw new InvalidOperationException("Solo se puede editar en estatus Borrador");
 
             _empleados.Clear();
+        }
+
+        public void Enviar()
+        {
+            if (EstatusSolicitudId != (int)EstatusSolicitudEnum.Borrador)
+                throw new InvalidOperationException("Solo se puede enviar desde Borrador");
+
+            if (!_empleados.Any())
+                throw new InvalidOperationException("Debe existir al menos un empleado");
+
+            CambiarEstatus(EstatusSolicitudEnum.EnAutorizaciónPorResponsableDeObra);
+        }
+
+        public void Aprobar()
+        {
+            if (EstatusSolicitudId != (int)EstatusSolicitudEnum.EnAutorizaciónPorResponsableDeObra)
+                throw new InvalidOperationException("No se puede aprobar en este estado");
+
+            CambiarEstatus(EstatusSolicitudEnum.AutorizadaPorResponsableDeObra);
+
+            CambiarEstatus(EstatusSolicitudEnum.EnProceso);
+        }
+
+        public void Rechazar(int autorizadorId, string? comentario)
+        {
+            if (EstatusSolicitudId != (int)EstatusSolicitudEnum.EnAutorizaciónPorResponsableDeObra)
+                throw new InvalidOperationException("No se puede rechazar en este estado");
+
+            var autorizacion = Autorizaciones
+                .FirstOrDefault(x => x.AutorizadorId == autorizadorId);
+
+            if (autorizacion == null)
+                throw new InvalidOperationException("No tienes autorización para esta solicitud");
+
+            if (autorizacion.EstatusAutorizacionId != (int)EstatusAutorizacionEnum.Pendiente)
+                throw new InvalidOperationException("Esta autorización ya fue atendida");
+
+            autorizacion.Rechazar(comentario);
+
+            Comentarios = comentario;
+
+            CambiarEstatus(EstatusSolicitudEnum.Rechazada);
+        }
+
+        public void Terminar()
+        {
+            if (EstatusSolicitudId != (int)EstatusSolicitudEnum.EnProceso)
+                throw new InvalidOperationException("Solo se puede terminar en proceso");
+
+            if (!_empleados.Any())
+                throw new InvalidOperationException("La solicitud no tiene empleados");
+
+            foreach (var empleado in _empleados)
+            {
+                var tieneServicios =
+                    empleado.Hoteles.Any() ||
+                    empleado.Comidas.Any();
+
+                if (!tieneServicios)
+                    throw new InvalidOperationException(
+                        $"El empleado {empleado.EmpleadoId} no tiene servicios asignados");
+            }
+
+            CambiarEstatus(EstatusSolicitudEnum.Terminada);
+        }
+
+        public void Cancelar(string? comentario)
+        {
+            if (EstatusSolicitudId == (int)EstatusSolicitudEnum.Terminada)
+                throw new InvalidOperationException("No se puede cancelar una solicitud terminada");
+
+            if (EstatusSolicitudId == (int)EstatusSolicitudEnum.Cancelada)
+                throw new InvalidOperationException("La solicitud ya está cancelada");
+
+            Comentarios = comentario;
+
+            CambiarEstatus(EstatusSolicitudEnum.Cancelada);
         }
     }
 }

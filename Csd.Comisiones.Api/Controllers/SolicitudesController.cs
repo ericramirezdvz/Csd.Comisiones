@@ -1,8 +1,13 @@
-﻿using Csd.Comisiones.Application.Features.Solicitudes.ApproveSolicitud;
+﻿using Csd.Comisiones.Api.Dtos;
+using Csd.Comisiones.Application.Features.Solicitudes.ApproveSolicitud;
+using Csd.Comisiones.Application.Features.Solicitudes.CancelSolicitud;
+using Csd.Comisiones.Application.Features.Solicitudes.CompleteSolicitud;
 using Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud;
 using Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById;
 using Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudes;
+using Csd.Comisiones.Application.Features.Solicitudes.RejectSolicitud;
 using Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud;
+using Csd.Comisiones.Application.Features.Solicitudes.UpdateSolicitud;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +34,65 @@ namespace Csd.Comisiones.Api.Controllers
             return CreatedAtAction(nameof(Create), new { id }, id);
         }
 
+        [HttpPost("{id}/send")]
+        public async Task<IActionResult> Send(int id)
+        {
+            await _mediator.Send(new EnviarSolicitudCommand
+            {
+                SolicitudId = id
+            });
+
+            return NoContent();
+        }
+
+        [HttpPost("{id}/approve")]
+        public async Task<IActionResult> Approve(int id, [FromBody]AprobarSolicitudRequest request)
+        {
+            await _mediator.Send(new AprobarSolicitudCommand
+            {
+                SolicitudId = id,
+                Comentarios = request.Comentarios
+            });
+
+            return NoContent();
+        }
+
+        [HttpPost("{id}/cancel")]
+        public async Task<IActionResult> Cancel(int id, [FromBody] CancelarSolicitudRequest request)
+        {
+            await _mediator.Send(new CancelarSolicitudCommand
+            {
+                SolicitudId = id,
+                Comentarios = request.Comentarios
+            });
+
+            return NoContent();
+        }
+
+        [HttpPost("{id}/complete")]
+        public async Task<IActionResult> Complete(int id)
+        {
+            await _mediator.Send(new CompletarSolicitudCommand
+            {
+                SolicitudId = id
+            });
+
+            return NoContent();
+        }
+
+        [HttpPost("{id}/reject")]
+        public async Task<IActionResult> Reject(int id, [FromBody] RechazarSolicitudCommand request)
+        {
+            await _mediator.Send(new RechazarSolicitudCommand
+            {
+                SolicitudId = id,
+                Comentarios = request.Comentarios,
+                AutorizadorId = request.AutorizadorId
+            });
+
+            return NoContent();
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -48,32 +112,10 @@ namespace Csd.Comisiones.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPost("{id}/approve")]
-        public async Task<IActionResult> Approve(int id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateSolicitudCommand request)
         {
-            await _mediator.Send(new AprobarSolicitudCommand
-            {
-                SolicitudId = id
-            });
-
-            return NoContent();
-        }
-
-        [HttpPost("{id}/send")]
-        public async Task<IActionResult> Send(int id)
-        {
-            await _mediator.Send(new EnviarSolicitudCommand
-            {
-                SolicitudId = id
-            });
-
-            return NoContent();
-        }
-
-        [HttpPost("{id}/reject")]
-        public async Task<IActionResult> Rechazar(int id)
-        {
-            await _mediator.Send(new EnviarSolicitudCommand
+            await _mediator.Send(new UpdateSolicitudCommand
             {
                 SolicitudId = id
             });

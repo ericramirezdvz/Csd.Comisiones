@@ -32,34 +32,9 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.RejectSolicitud
             if (solicitud == null)
                 throw new Exception("Solicitud no encontrada");
 
-            // Validar estado
-            if (solicitud.EstatusSolicitudId != (int)EstatusSolicitudEnum.EnAutorizaciónPorResponsableDeObra)
-                throw new Exception("La solicitud no está en proceso de autorización");
+            solicitud.Rechazar(request.AutorizadorId, request.Comentarios);
 
-            // Buscar autorización del usuario
-            var autorizacion = solicitud.Autorizaciones
-                .FirstOrDefault(x => x.AutorizadorId == request.AutorizadorId);
-
-            if (autorizacion == null)
-                throw new Exception("No tienes autorización para esta solicitud");
-
-            if (autorizacion.EstatusAutorizacionId != (int)EstatusAutorizacionEnum.Pendiente)
-                throw new Exception("Esta autorización ya fue atendida");
-
-            // Rechazar
-            autorizacion.Rechazar(request.Comentarios);
-
-            // Cancelar las demás pendientes
-            foreach (var otra in solicitud.Autorizaciones
-                         .Where(x => x.SolicitudAutorizacionId != autorizacion.SolicitudAutorizacionId
-                                  && x.EstatusAutorizacionId == (int)EstatusAutorizacionEnum.Pendiente))
-            {
-                // opción simple: no hacer nada (quedan pendientes pero irrelevantes)
-                // opción pro: marcar como canceladas (requiere nuevo estatus)
-            }
-
-            // Cambiar estatus de solicitud
-            solicitud.CambiarEstatus(EstatusSolicitudEnum.Rechazada);
+            await _solicitudRepository.UpdateAsync(solicitud);
 
             await _solicitudRepository.SaveChangesAsync(cancellationToken);
 

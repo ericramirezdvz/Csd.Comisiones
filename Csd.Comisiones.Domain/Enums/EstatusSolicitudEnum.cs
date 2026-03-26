@@ -10,7 +10,7 @@ namespace Csd.Comisiones.Domain.Enums
     {
         Borrador = 1,
         EnAutorizaciónPorResponsableDeObra = 2,
-        AutorizadaPorResposableDeObra = 3,
+        AutorizadaPorResponsableDeObra = 3,
         EnProceso = 4, // Pedro (asignación de proveedores) -> Enviar a proveedores -> Proveedores acepta o rechazan -> 
         Terminada = 5,
         Rechazada = 6,
