@@ -31,6 +31,14 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudes
                 .Select(s => new SolicitudListItemDto
                 {
                     SolicitudId = s.SolicitudId,
+                    Folio = s.Folio,
+
+                    ObraId = s.ObraId,
+                    ObraNombre = s.Obra.Nombre,
+
+                    EstatusSolicitudId = s.EstatusSolicitudId,
+                    EstatusNombre = s.Estatus.Nombre,
+
                     FechaInicio = s.FechaInicio,
                     FechaFin = s.FechaFin,
 
