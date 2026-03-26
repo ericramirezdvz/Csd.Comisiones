@@ -1,4 +1,5 @@
-﻿using Csd.Comisiones.Application.Contracts.Infrastructure;
+﻿using Csd.Comisiones.Application.Common.Models;
+using Csd.Comisiones.Application.Contracts.Infrastructure;
 using Csd.Comisiones.Application.Contracts.Persistence;
 using Csd.Comisiones.Domain.Entities;
 using Csd.Comisiones.Domain.Enums;
@@ -31,6 +32,12 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
         {
             var solicitud = await _context.Solicitud
                 .Include(x => x.Autorizaciones)
+                .Include(x => x.Empleados)
+                    .ThenInclude(e => e.Empleado)
+                .Include(x => x.Empleados)
+                    .ThenInclude(e => e.Hoteles)
+                .Include(x => x.Empleados)
+                    .ThenInclude(e => e.Comidas)
                 .FirstOrDefaultAsync(x => x.SolicitudId == request.SolicitudId, cancellationToken);
 
             if (solicitud == null)
@@ -62,6 +69,29 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
             await _solicitudRepository.UpdateAsync(solicitud);
             await _solicitudRepository.SaveChangesAsync(cancellationToken);
 
+            var empleadosEmail = solicitud.Empleados
+            .Select(e => new EmpleadoEmailDto
+            {
+                Nombre = e.Empleado.NombreCompleto,
+                FechaInicio = e.FechaInicio,
+                FechaFin = e.FechaFin,
+                RequiereHotel = e.Hoteles.Any(h => h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada),
+
+                Desayuno = e.Comidas.Any(c =>
+                    c.TipoComidaId == (int)TipoComidaEnum.Desayuno &&
+                    c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada),
+
+                Almuerzo = e.Comidas.Any(c =>
+                    c.TipoComidaId == (int)TipoComidaEnum.Almuerzo &&
+                    c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada),
+
+                Cena = e.Comidas.Any(c =>
+                    c.TipoComidaId == (int)TipoComidaEnum.Cena &&
+                    c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada)
+            })
+            .ToList();
+
+            // 🔹 Obtener correos de autorizadores (optimizado)
             var empleados = await _context.Empleado
                 .Where(e => autorizadores
                     .Select(a => a.EmpleadoId)
@@ -73,19 +103,24 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
                 .Where(e => !string.IsNullOrEmpty(e.Correo))
                 .ToDictionary(e => e.EmpleadoId, e => e.Correo!);
 
-            foreach (var autorizador in autorizadores)
+            var tasks = autorizadores
+            .Where(a => empleadosDict.ContainsKey(a.EmpleadoId))
+            .Select(a =>
             {
-                if (empleadosDict.TryGetValue(autorizador.EmpleadoId, out var correo))
-                {
-                    await _emailService.SendSolicitudPendienteAsync(
-                        correo,
-                        solicitud.Folio,
-                        solicitud.ObraId.ToString(),
-                        solicitud.FechaInicio,
-                        solicitud.FechaFin
-                    );
-                }
-            }
+                var correo = empleadosDict[a.EmpleadoId];
+
+                return _emailService.SendSolicitudPendienteAsync(
+                    solicitud.SolicitudId,
+                    correo,
+                    solicitud.Folio,
+                    solicitud.ObraId.ToString(),
+                    solicitud.FechaInicio,
+                    solicitud.FechaFin,
+                    empleadosEmail
+                );
+            });
+
+            await Task.WhenAll(tasks);
 
             return Unit.Value;
         }
