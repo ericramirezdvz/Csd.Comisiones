@@ -9,6 +9,13 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudes
     public class SolicitudListItemDto
     {
         public int SolicitudId { get; set; }
+        public string Folio { get; set; } = string.Empty;
+
+        public int ObraId { get; set; }
+        public string ObraNombre { get; set; } = string.Empty;
+
+        public int EstatusSolicitudId { get; set; }
+        public string EstatusNombre { get; set; } = string.Empty;
 
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
