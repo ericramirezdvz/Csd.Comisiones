@@ -19,31 +19,49 @@ namespace Csd.Comisiones.Infrastructure.Email
         }
 
         public async Task SendSolicitudPendienteAsync(
+        int solicitudId,
         string correo,
         string folio,
         string obra,
         DateTime fechaInicio,
-        DateTime fechaFin)
+        DateTime fechaFin,
+        List<EmpleadoEmailDto> empleados)
         {
-            var template = EmailTemplateHelper.LoadTemplate("SolicitudPendiente.html");
-            var urlAprobar = $"https://localhost/api/solicitudes/aprobar";
-            var urlRechazar = $"https://locahost/api/solicitudes/rechazar";
+            var template = EmailTemplateHelper.LoadTemplate("SolicitudPendienteEmpleados.html");
+
+            var baseUrl = "http://localhost"; //_settings.BaseUrl;
+
+            var urlAprobar = $"{baseUrl}/api/solicitudes/{solicitudId}/approve";
+            var urlRechazar = $"{baseUrl}/api/solicitudes/{solicitudId}/reject";
+
+            var empleadosRows = string.Join("", empleados.Select(e => $@"
+                <tr style='text-align:center; border-bottom:1px solid #eee;'>
+                    <td>{e.Nombre}</td>
+                    <td>{e.FechaInicio:dd/MM/yyyy}</td>
+                    <td>{e.FechaFin:dd/MM/yyyy}</td>
+                    <td>{(e.RequiereHotel ? "✔" : "")}</td>
+                    <td>{(e.Desayuno ? "✔" : "")}</td>
+                    <td>{(e.Almuerzo ? "✔" : "")}</td>
+                    <td>{(e.Cena ? "✔" : "")}</td>
+                </tr>"));
+
 
             var body = EmailTemplateHelper.Replace(template, new Dictionary<string, string>
-        {
-            { "Folio", folio },
-            { "Obra", obra },
-            { "FechaInicio", fechaInicio.ToString("dd/MM/yyyy") },
-            { "FechaFin", fechaFin.ToString("dd/MM/yyyy") },
-            { "UrlAprobar", urlAprobar },
-            { "UrlRechazar", urlRechazar }
-        });
+            {
+                { "Folio", folio },
+                { "Obra", obra },
+                { "FechaInicio", fechaInicio.ToString("dd/MM/yyyy") },
+                { "FechaFin", fechaFin.ToString("dd/MM/yyyy") },
+                { "UrlAprobar", urlAprobar },
+                { "UrlRechazar", urlRechazar },
+                { "EmpleadosRows", empleadosRows }
+            });
 
             var email = new MimeMessage();
 
             email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
             email.To.Add(MailboxAddress.Parse(correo));
-            email.Subject = "Solicitud pendiente de autorización";
+            email.Subject = $"Solicitud {folio} pendiente de autorización";
 
             var builder = new BodyBuilder
             {

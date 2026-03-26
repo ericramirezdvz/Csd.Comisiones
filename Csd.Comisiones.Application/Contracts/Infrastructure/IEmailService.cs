@@ -10,10 +10,12 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
     public interface IEmailService
     {
         Task SendSolicitudPendienteAsync(
+            int solicitudId,
             string correo,
             string folio,
             string obra,
             DateTime fechaInicio,
-            DateTime fechaFin);
+            DateTime fechaFin,
+            List<EmpleadoEmailDto> empleados);
     }
 }
