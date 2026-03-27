@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Csd.Comisiones.Application.Features.TiposHabitacion.GetTipoHabitacion
 {
-    public class GetTiposHabitacionQuery : IRequest<List<TipoHabitacionDto>>
+    public class GetTipoHabitacionQuery : IRequest<List<TipoHabitacionDto>>
     {
     }
 }

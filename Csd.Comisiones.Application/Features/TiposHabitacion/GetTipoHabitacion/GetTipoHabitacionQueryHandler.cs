@@ -10,16 +10,16 @@ using System.Threading.Tasks;
 
 namespace Csd.Comisiones.Application.Features.TiposHabitacion.GetTipoHabitacion
 {
-    public class GetTiposHabitacionQueryHandler : IRequestHandler<GetTiposHabitacionQuery, List<TipoHabitacionDto>>
+    public class GetTipoHabitacionQueryHandler : IRequestHandler<GetTipoHabitacionQuery, List<TipoHabitacionDto>>
     {
         private readonly IApplicationDbContext _context;
 
-        public GetTiposHabitacionQueryHandler(IApplicationDbContext context)
+        public GetTipoHabitacionQueryHandler(IApplicationDbContext context)
         {
             _context = context;
         }
 
-        public async Task<List<TipoHabitacionDto>> Handle(GetTiposHabitacionQuery request, CancellationToken cancellationToken)
+        public async Task<List<TipoHabitacionDto>> Handle(GetTipoHabitacionQuery request, CancellationToken cancellationToken)
         {
             return await _context.TipoHabitacion
                 .AsNoTracking()
