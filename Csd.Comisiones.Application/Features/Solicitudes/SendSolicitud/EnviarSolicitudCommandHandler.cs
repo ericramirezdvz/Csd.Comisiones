@@ -70,24 +70,40 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
             await _solicitudRepository.SaveChangesAsync(cancellationToken);
 
             var empleadosEmail = solicitud.Empleados
-            .Select(e => new EmpleadoEmailDto
+            .Select(e =>
             {
-                Nombre = e.Empleado.NombreCompleto,
-                FechaInicio = e.FechaInicio,
-                FechaFin = e.FechaFin,
-                RequiereHotel = e.Hoteles.Any(h => h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada),
+                var hotelesActivos = e.Hoteles
+                    .Where(h => h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada);
 
-                Desayuno = e.Comidas.Any(c =>
-                    c.TipoComidaId == (int)TipoComidaEnum.Desayuno &&
-                    c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada),
+                var comidasActivas = e.Comidas
+                    .Where(c => c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada);
 
-                Almuerzo = e.Comidas.Any(c =>
-                    c.TipoComidaId == (int)TipoComidaEnum.Almuerzo &&
-                    c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada),
+                // 🛏️ HOTEL
+                //var totalHotel = hotelesActivos.Sum(h =>
+                //{
+                //    var noches = (h.FechaFin - h.FechaInicio).Days;
+                //    return noches * h.PrecioUnitario;
+                //});
 
-                Cena = e.Comidas.Any(c =>
-                    c.TipoComidaId == (int)TipoComidaEnum.Cena &&
-                    c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada)
+                // 🍽️ COMIDA
+                //var totalComida = comidasActivas.Sum(c => c.PrecioUnitario);
+
+                //var total = totalHotel + totalComida;
+
+                return new EmpleadoEmailDto
+                {
+                    Nombre = e.Empleado.NombreCompleto,
+                    FechaInicio = e.FechaInicio,
+                    FechaFin = e.FechaFin,
+
+                    RequiereHotel = hotelesActivos.Any(),
+
+                    Desayuno = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Desayuno),
+                    Almuerzo = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Almuerzo),
+                    Cena = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Cena),
+
+                    Total = 0 //total
+                };
             })
             .ToList();
 

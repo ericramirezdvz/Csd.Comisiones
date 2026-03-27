@@ -15,5 +15,6 @@ namespace Csd.Comisiones.Application.Common.Models
         public bool Desayuno { get; set; }
         public bool Almuerzo { get; set; }
         public bool Cena { get; set; }
+        public decimal Total { get; set; }
     }
 }

@@ -23,6 +23,8 @@ namespace Csd.Comisiones.Domain.Entities
 
         public bool Activo { get; private set; }
 
+        public ICollection<ProveedorServicio> Servicios { get; private set; } = new List<ProveedorServicio>();
+
         private Proveedor() { }
 
         public Proveedor(

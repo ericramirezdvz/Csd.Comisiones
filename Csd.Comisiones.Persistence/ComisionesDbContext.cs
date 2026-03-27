@@ -19,6 +19,7 @@ namespace Csd.Comisiones.Persistence
         public DbSet<EstatusSolicitud> EstatusSolicitud { get; set; }
         public DbSet<EstatusDetalle> EstatusDetalle { get; set; }
         public DbSet<Proveedor> Proveedor { get; set; }
+        public DbSet<ProveedorServicio> ProveedorServicio { get; set; }
         public DbSet<Solicitud> Solicitud { get; set; }
         public DbSet<SolicitudComida> SolicitudComida { get; set; }
         public DbSet<SolicitudEmpleado> SolicitudEmpleado { get; set; }

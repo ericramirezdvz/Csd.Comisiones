@@ -43,6 +43,7 @@ namespace Csd.Comisiones.Infrastructure.Email
                     <td>{(e.Desayuno ? "✔" : "")}</td>
                     <td>{(e.Almuerzo ? "✔" : "")}</td>
                     <td>{(e.Cena ? "✔" : "")}</td>
+                    <td><strong>${e.Total:N2}</strong></td>
                 </tr>"));
 
 
