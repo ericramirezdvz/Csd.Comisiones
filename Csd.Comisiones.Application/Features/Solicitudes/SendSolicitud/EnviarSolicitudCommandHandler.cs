@@ -78,14 +78,14 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
                 var comidasActivas = e.Comidas
                     .Where(c => c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada);
 
-                // 🛏️ HOTEL
+                // HOTEL
                 //var totalHotel = hotelesActivos.Sum(h =>
                 //{
                 //    var noches = (h.FechaFin - h.FechaInicio).Days;
                 //    return noches * h.PrecioUnitario;
                 //});
 
-                // 🍽️ COMIDA
+                // COMIDA
                 //var totalComida = comidasActivas.Sum(c => c.PrecioUnitario);
 
                 //var total = totalHotel + totalComida;
