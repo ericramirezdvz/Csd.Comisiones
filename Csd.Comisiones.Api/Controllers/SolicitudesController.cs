@@ -7,6 +7,7 @@ using Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById;
 using Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudes;
 using Csd.Comisiones.Application.Features.Solicitudes.RejectSolicitud;
 using Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud;
+using Csd.Comisiones.Application.Features.Solicitudes.TrackingSolicitud;
 using Csd.Comisiones.Application.Features.Solicitudes.UpdateSolicitud;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -122,5 +123,16 @@ namespace Csd.Comisiones.Api.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("{id}/tracking")]
+        public async Task<IActionResult> Tracking(int id)
+        {
+            var result = await _mediator.Send(new SeguimientoSolicitudQuery(id));
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
     }
 }
