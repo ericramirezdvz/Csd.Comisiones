@@ -26,7 +26,15 @@ namespace Csd.Comisiones.Application.Features.Proveedores.GetProveedores
                 .Select(p => new ProveedorDto
                 {
                     ProveedorId = p.ProveedorId,
-                    Nombre = p.Nombre
+                    Nombre = p.Nombre,
+                    ProporcionaHospedaje = p.ProporcionaHospedaje,
+                    ProporcionaAlimentos = p.ProporcionaAlimentos,
+                    Servicios = p.Servicios.Select(s => new ProveedorServicioDto
+                    {
+                        TipoServicioId = (int)s.TipoServicio,
+                        TipoServicioNombre = s.TipoServicio.ToString(),
+                        Precio = s.Precio
+                    }).ToList()
                 });
 
             var totalCount = await query.CountAsync(cancellationToken);

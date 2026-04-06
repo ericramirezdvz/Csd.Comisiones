@@ -116,10 +116,8 @@ namespace Csd.Comisiones.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateSolicitudCommand request)
         {
-            await _mediator.Send(new UpdateSolicitudCommand
-            {
-                SolicitudId = id
-            });
+            request.SolicitudId = id;
+            await _mediator.Send(request);
 
             return NoContent();
         }

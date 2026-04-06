@@ -101,8 +101,15 @@ namespace Csd.Comisiones.Domain.Entities
             DateTime fechaFin,
             string? comentarios)
         {
-            if (EstatusSolicitudId != (int)EstatusSolicitudEnum.Borrador)
-                throw new InvalidOperationException("Solo se puede editar en estatus Borrador");
+            var estatusPermitidos = new[]
+            {
+                (int)EstatusSolicitudEnum.Borrador,
+                (int)EstatusSolicitudEnum.AutorizadaPorResponsableDeObra,
+                (int)EstatusSolicitudEnum.EnProceso
+            };
+
+            if (!estatusPermitidos.Contains(EstatusSolicitudId))
+                throw new InvalidOperationException("Solo se puede editar en estatus Borrador, Autorizada o En Proceso");
 
             if (fechaFin < fechaInicio)
                 throw new ArgumentException("La fecha fin no puede ser menor a la fecha inicio.");
@@ -116,8 +123,15 @@ namespace Csd.Comisiones.Domain.Entities
 
         public void LimpiarEmpleados()
         {
-            if (EstatusSolicitudId != (int)EstatusSolicitudEnum.Borrador)
-                throw new InvalidOperationException("Solo se puede editar en estatus Borrador");
+            var estatusPermitidos = new[]
+            {
+                (int)EstatusSolicitudEnum.Borrador,
+                (int)EstatusSolicitudEnum.AutorizadaPorResponsableDeObra,
+                (int)EstatusSolicitudEnum.EnProceso
+            };
+
+            if (!estatusPermitidos.Contains(EstatusSolicitudId))
+                throw new InvalidOperationException("Solo se puede editar en estatus Borrador, Autorizada o En Proceso");
 
             _empleados.Clear();
         }
