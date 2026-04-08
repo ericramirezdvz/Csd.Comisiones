@@ -53,6 +53,13 @@ namespace Csd.Comisiones.Persistence.Configurations
                 .WithMany()
                 .HasForeignKey(x => x.EstatusDetalleId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Relación con UbicacionAlimento
+            builder
+                .HasOne<UbicacionAlimento>()
+                .WithMany()
+                .HasForeignKey(x => x.UbicacionAlimentoId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
