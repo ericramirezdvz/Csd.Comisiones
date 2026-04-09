@@ -26,6 +26,10 @@ namespace Csd.Comisiones.Persistence.Configurations
                     .IsRequired()
                     .HasMaxLength(150);
 
+                builder.Property(c => c.EmpresaId)
+                    .IsRequired()
+                    .HasMaxLength(150);
+
                 builder.Property(c => c.Activo)
                     .IsRequired();
 

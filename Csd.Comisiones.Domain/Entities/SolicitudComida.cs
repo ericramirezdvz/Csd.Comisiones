@@ -18,7 +18,7 @@ namespace Csd.Comisiones.Domain.Entities
 
         public int? ProveedorId { get; private set; }
 
-        public int UbicacionId { get; private set; }
+        public int UbicacionAlimentoId { get; private set; }
 
         public DateTime FechaInicio { get; private set; }
 
@@ -49,7 +49,7 @@ namespace Csd.Comisiones.Domain.Entities
 
             TipoComidaId = tipoComidaId;
             ProveedorId = proveedorId;
-            UbicacionId = ubicacionId;
+            UbicacionAlimentoId = ubicacionId;
             FechaInicio = fechaInicio;
             FechaFin = fechaFin;
             PrecioUnitario = precioUnitario;

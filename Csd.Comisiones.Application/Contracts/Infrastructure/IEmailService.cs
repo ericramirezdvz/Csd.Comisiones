@@ -17,5 +17,22 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
             DateTime fechaInicio,
             DateTime fechaFin,
             List<EmpleadoEmailDto> empleados);
+
+        Task SendSolicitudAprobadaAsync(
+            string correo,
+            string folio,
+            string obra,
+            DateTime fechaInicio,
+            DateTime fechaFin,
+            List<EmpleadoEmailDto> empleados);
+
+        Task SendSolicitudRechazadaAsync(
+            string correo,
+            string folio,
+            string obra,
+            DateTime fechaInicio,
+            DateTime fechaFin,
+            List<EmpleadoEmailDto> empleados,
+            string? motivo);
     }
 }

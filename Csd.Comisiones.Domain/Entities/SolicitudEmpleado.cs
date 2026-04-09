@@ -1,4 +1,5 @@
 ﻿using Csd.Comisiones.Domain.Common;
+using Csd.Comisiones.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace Csd.Comisiones.Domain.Entities
 
         public DateTime FechaInicio { get; private set; }
         public DateTime FechaFin { get; private set; }
+        public TipoAsignacionEnum TipoAsignacion { get; private set; }
+        public decimal? MontoPago { get; private set; }
         public Solicitud Solicitud { get; private set; } = null!;
         public Empleado Empleado { get; set; } = null!;
 
@@ -37,16 +40,74 @@ namespace Csd.Comisiones.Domain.Entities
             EmpleadoId = empleadoId;
             FechaInicio = fechaInicio;
             FechaFin = fechaFin;
+            TipoAsignacion = TipoAsignacionEnum.Servicios;
         }
 
         public void AgregarHotel(SolicitudHotel hotel)
         {
+            if (TipoAsignacion == TipoAsignacionEnum.Pago)
+                throw new InvalidOperationException("No se pueden agregar hoteles a un pago");
+
             _hoteles.Add(hotel);
         }
 
         public void AgregarComida(SolicitudComida comida)
         {
+            if (TipoAsignacion == TipoAsignacionEnum.Pago)
+                throw new InvalidOperationException("No se pueden agregar comidas a un pago");
+
             _comidas.Add(comida);
+        }
+
+        public static SolicitudEmpleado CrearPago(
+        int empleadoId,
+        DateTime fechaInicio,
+        DateTime fechaFin,
+        decimal monto)
+        {
+            if (fechaFin < fechaInicio)
+                throw new ArgumentException("La fecha fin no puede ser menor a la fecha inicio.");
+
+            if (monto <= 0)
+                throw new ArgumentException("El monto debe ser mayor a 0");
+
+            var hoy = DateTime.Now.Date;
+
+            if (fechaInicio.Date < hoy.AddDays(3))
+                throw new InvalidOperationException("No se pueden crear solicitudes de pago con menos de 3 días de anticipación");
+
+            return new SolicitudEmpleado
+            {
+                EmpleadoId = empleadoId,
+                FechaInicio = fechaInicio,
+                FechaFin = fechaFin,
+                TipoAsignacion = TipoAsignacionEnum.Pago,
+                MontoPago = monto
+            };
+        }
+
+        public void ConvertirAPago(decimal monto)
+        {
+            if (_hoteles.Any() || _comidas.Any())
+                throw new InvalidOperationException("No se puede convertir a pago si ya existen servicios");
+
+            if (monto <= 0)
+                throw new ArgumentException("El monto debe ser mayor a 0");
+
+            var hoy = DateTime.Now.Date;
+
+            if (FechaInicio.Date < hoy.AddDays(3))
+                throw new InvalidOperationException("No se pueden crear solicitudes de pago con menos de 3 días de anticipación");
+
+
+            TipoAsignacion = TipoAsignacionEnum.Pago;
+            MontoPago = monto;
+        }
+
+        public void ConvertirAServicios()
+        {
+            TipoAsignacion = TipoAsignacionEnum.Servicios;
+            MontoPago = null;
         }
     }
 }

@@ -24,7 +24,8 @@ namespace Csd.Comisiones.Application.Features.Obras.GetObras
                 .Select(o => new ObraDto
                 {
                     Id = o.ObraId,
-                    Nombre = o.Nombre
+                    Nombre = o.Nombre,
+                    Empresa = o.EmpresaId != null ? o.EmpresaId.ToString() : ""
                 })
                 .ToListAsync(cancellationToken);
         }

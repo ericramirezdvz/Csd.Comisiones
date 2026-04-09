@@ -27,5 +27,6 @@ namespace Csd.Comisiones.Application.Contracts.Persistence
         public DbSet<Autorizador> Autorizador { get; set; }
         public DbSet<SolicitudAutorizacion> SolicitudAutorizacion { get; set; }
         public DbSet<ProveedorServicio> ProveedorServicio { get; set; }
+        public DbSet<UbicacionAlimento> UbicacionAlimento { get; set; }
     }
 }

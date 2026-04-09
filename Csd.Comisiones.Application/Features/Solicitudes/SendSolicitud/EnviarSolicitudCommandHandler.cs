@@ -69,6 +69,20 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
             await _solicitudRepository.UpdateAsync(solicitud);
             await _solicitudRepository.SaveChangesAsync(cancellationToken);
 
+            // CALCULAR LOS PRECIOS MAXIMOS PARA CADA SERVICIO
+            var preciosMaximos = await _context.ProveedorServicio
+                .GroupBy(x => x.TipoServicio)
+                .Select(g => new
+                {
+                    TipoServicio = g.Key,
+                    PrecioMaximo = g.Max(x => x.Precio)
+                })
+                .ToDictionaryAsync(x => x.TipoServicio, x => x.PrecioMaximo, cancellationToken);
+
+            decimal GetPrecioMax(TipoServicioEnum tipoServicio) =>
+            preciosMaximos.TryGetValue(tipoServicio, out var precio) ? precio : 0;
+
+            // ARMANDO EL EMAIL PARA LOS AUTORIZADORES
             var empleadosEmail = solicitud.Empleados
             .Select(e =>
             {
@@ -84,11 +98,26 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
                 //    var noches = (h.FechaFin - h.FechaInicio).Days;
                 //    return noches * h.PrecioUnitario;
                 //});
+                var totalHotel = hotelesActivos.Sum(h =>
+                {
+                    var noches = (h.FechaFin - h.FechaInicio).Days;
+
+                    var tipoServicio = h.TipoHabitacionId == (int)TipoServicioEnum.HabitacionSencilla
+                        ? (int)TipoServicioEnum.HabitacionSencilla
+                        : (int)TipoServicioEnum.HabitacionDoble;
+
+                    var precioMax = GetPrecioMax((TipoServicioEnum)tipoServicio);
+
+                    return noches * precioMax;
+                });
+
 
                 // COMIDA
                 //var totalComida = comidasActivas.Sum(c => c.PrecioUnitario);
-
-                //var total = totalHotel + totalComida;
+                var precioAlimentoMax = GetPrecioMax(TipoServicioEnum.Alimento);
+                var totalComida = comidasActivas.Count() * precioAlimentoMax;
+                
+                var total = totalHotel + totalComida;
 
                 return new EmpleadoEmailDto
                 {
@@ -102,12 +131,12 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
                     Almuerzo = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Almuerzo),
                     Cena = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Cena),
 
-                    Total = 0 //total
+                    Total = total
                 };
             })
             .ToList();
 
-            // 🔹 Obtener correos de autorizadores (optimizado)
+            // Obtener correos de autorizadores
             var empleados = await _context.Empleado
                 .Where(e => autorizadores
                     .Select(a => a.EmpleadoId)

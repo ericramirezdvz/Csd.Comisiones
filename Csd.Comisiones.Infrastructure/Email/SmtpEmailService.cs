@@ -19,13 +19,13 @@ namespace Csd.Comisiones.Infrastructure.Email
         }
 
         public async Task SendSolicitudPendienteAsync(
-        int solicitudId,
-        string correo,
-        string folio,
-        string obra,
-        DateTime fechaInicio,
-        DateTime fechaFin,
-        List<EmpleadoEmailDto> empleados)
+            int solicitudId,
+            string correo,
+            string folio,
+            string obra,
+            DateTime fechaInicio,
+            DateTime fechaFin,
+            List<EmpleadoEmailDto> empleados)
         {
             var template = EmailTemplateHelper.LoadTemplate("SolicitudPendienteEmpleados.html");
 
@@ -63,6 +63,120 @@ namespace Csd.Comisiones.Infrastructure.Email
             email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
             email.To.Add(MailboxAddress.Parse(correo));
             email.Subject = $"Solicitud {folio} pendiente de autorización";
+
+            var builder = new BodyBuilder
+            {
+                HtmlBody = body
+            };
+
+            email.Body = builder.ToMessageBody();
+
+            using var smtp = new SmtpClient();
+
+            await smtp.ConnectAsync(_settings.Server, _settings.Port,
+                _settings.UseSSL ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto);
+
+            await smtp.AuthenticateAsync(_settings.Username, _settings.Password);
+
+            await smtp.SendAsync(email);
+
+            await smtp.DisconnectAsync(true);
+        }
+
+        public async Task SendSolicitudAprobadaAsync(
+            string correo,
+            string folio,
+            string obra,
+            DateTime fechaInicio,
+            DateTime fechaFin,
+            List<EmpleadoEmailDto> empleados)
+        {
+            var template = EmailTemplateHelper.LoadTemplate("SolicitudAprobadaEmpleados.html");
+
+            var empleadosRows = string.Join("", empleados.Select(e => $@"
+                <tr style='text-align:center; border-bottom:1px solid #eee;'>
+                    <td>{e.Nombre}</td>
+                    <td>{e.FechaInicio:dd/MM/yyyy}</td>
+                    <td>{e.FechaFin:dd/MM/yyyy}</td>
+                    <td>{(e.RequiereHotel ? "✔" : "")}</td>
+                    <td>{(e.Desayuno ? "✔" : "")}</td>
+                    <td>{(e.Almuerzo ? "✔" : "")}</td>
+                    <td>{(e.Cena ? "✔" : "")}</td>
+                    <td><strong>${e.Total:N2}</strong></td>
+                </tr>"));
+
+            var body = EmailTemplateHelper.Replace(template, new Dictionary<string, string>
+            {
+                { "Folio", folio },
+                { "Obra", obra },
+                { "FechaInicio", fechaInicio.ToString("dd/MM/yyyy") },
+                { "FechaFin", fechaFin.ToString("dd/MM/yyyy") },
+                { "EmpleadosRows", empleadosRows }
+            });
+
+            var email = new MimeMessage();
+
+            email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
+            email.To.Add(MailboxAddress.Parse(correo));
+            email.Subject = $"Solicitud {folio} aprobada";
+
+            var builder = new BodyBuilder
+            {
+                HtmlBody = body
+            };
+
+            email.Body = builder.ToMessageBody();
+
+            using var smtp = new SmtpClient();
+
+            await smtp.ConnectAsync(_settings.Server, _settings.Port,
+                _settings.UseSSL ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto);
+
+            await smtp.AuthenticateAsync(_settings.Username, _settings.Password);
+
+            await smtp.SendAsync(email);
+
+            await smtp.DisconnectAsync(true);
+        }
+
+        public async Task SendSolicitudRechazadaAsync(
+            string correo,
+            string folio,
+            string obra,
+            DateTime fechaInicio,
+            DateTime fechaFin,
+            List<EmpleadoEmailDto> empleados,
+            string? motivo)
+        {
+            var template = EmailTemplateHelper.LoadTemplate("SolicitudRechazadaEmpleados.html");
+
+            var empleadosRows = string.Join("", empleados.Select(e => $@"
+                <tr style='text-align:center; border-bottom:1px solid #eee;'>
+                    <td>{e.Nombre}</td>
+                    <td>{e.FechaInicio:dd/MM/yyyy}</td>
+                    <td>{e.FechaFin:dd/MM/yyyy}</td>
+                    <td>{(e.RequiereHotel ? "✔" : "")}</td>
+                    <td>{(e.Desayuno ? "✔" : "")}</td>
+                    <td>{(e.Almuerzo ? "✔" : "")}</td>
+                    <td>{(e.Cena ? "✔" : "")}</td>
+                    <td><strong>${e.Total:N2}</strong></td>
+                </tr>"));
+
+            var body = EmailTemplateHelper.Replace(template, new Dictionary<string, string>
+            {
+                { "Folio", folio },
+                { "Obra", obra },
+                { "FechaInicio", fechaInicio.ToString("dd/MM/yyyy") },
+                { "FechaFin", fechaFin.ToString("dd/MM/yyyy") },
+                { "Motivo", motivo ?? "No especificado" },
+                { "EmpleadosRows", empleadosRows }
+            });
+
+            var email = new MimeMessage();
+
+            email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
+            email.To.Add(MailboxAddress.Parse(correo));
+            email.Subject = $"Solicitud {folio} rechazada";
 
             var builder = new BodyBuilder
             {

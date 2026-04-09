@@ -13,15 +13,18 @@ namespace Csd.Comisiones.Domain.Entities
         public string Nombre { get; private set; } = string.Empty;
         public string Descripcion { get; private set; } = string.Empty;
         public bool Activo { get; private set; }
+        public string? EmpresaId { get; set; } = string.Empty;
 
         private Obra() { }
 
         public Obra(
             string nombre,
-            string descripcion)
+            string descripcion,
+            string? empresaId)
         {
             Nombre = nombre;
             Descripcion = descripcion;
+            EmpresaId = empresaId;
             Activo = true;
         }
     }
