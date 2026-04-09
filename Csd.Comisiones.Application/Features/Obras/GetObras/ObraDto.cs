@@ -10,5 +10,6 @@ namespace Csd.Comisiones.Application.Features.Obras.GetObras
     {
         public int Id { get; set; }
         public string Nombre { get; set; }
+        public string Empresa { get; set; }
     }
 }
