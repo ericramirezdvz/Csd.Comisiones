@@ -136,7 +136,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
             })
             .ToList();
 
-            // 🔹 Obtener correos de autorizadores (optimizado)
+            // Obtener correos de autorizadores
             var empleados = await _context.Empleado
                 .Where(e => autorizadores
                     .Select(a => a.EmpleadoId)
