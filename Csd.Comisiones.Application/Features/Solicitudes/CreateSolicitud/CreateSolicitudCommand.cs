@@ -13,6 +13,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud
 
         public int AreaId { get; set; }
         public int ObraId { get; set; }
+        public int CiudadId { get; set; }
         public int SolicitanteId { get; set; }
 
         public DateTime FechaInicio { get; set; }

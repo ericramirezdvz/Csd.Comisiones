@@ -29,6 +29,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.UpdateSolicitud
             solicitud.Actualizar(
                 request.AreaId,
                 request.ObraId,
+                request.CiudadId,
                 request.FechaInicio,
                 request.FechaFin,
                 request.Comentarios);

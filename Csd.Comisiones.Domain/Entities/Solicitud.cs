@@ -14,6 +14,7 @@ namespace Csd.Comisiones.Domain.Entities
         public string Folio { get; private set; } = string.Empty;
         public int AreaId { get; private set; }
         public int ObraId { get; private set; }
+        public int? CiudadId { get; set; }
         public int SolicitanteId { get; private set; }
         public int EstatusSolicitudId { get; private set; }
         public DateTime FechaInicio { get; private set; }
@@ -22,6 +23,7 @@ namespace Csd.Comisiones.Domain.Entities
 
         public Area Area { get; private set; } = null!;
         public Obra Obra { get; private set; } = null!;
+        public Ciudad Ciudad { get; private set; } = null!;
         public EstatusSolicitud Estatus { get; private set; } = null!;
 
         private readonly List<SolicitudEmpleado> _empleados = new();
@@ -39,6 +41,7 @@ namespace Csd.Comisiones.Domain.Entities
             string folio,
             int areaId,
             int obraId,
+            int ciudadId,
             int solicitanteId,
             DateTime fechaInicio,
             DateTime fechaFin,
@@ -50,6 +53,7 @@ namespace Csd.Comisiones.Domain.Entities
             Folio = folio;
             AreaId = areaId;
             ObraId = obraId;
+            CiudadId = ciudadId;
             SolicitanteId = solicitanteId;
             FechaInicio = fechaInicio;
             FechaFin = fechaFin;
@@ -97,6 +101,7 @@ namespace Csd.Comisiones.Domain.Entities
         public void Actualizar(
             int areaId,
             int obraId,
+            int ciudadId,
             DateTime fechaInicio,
             DateTime fechaFin,
             string? comentarios)
@@ -109,6 +114,7 @@ namespace Csd.Comisiones.Domain.Entities
 
             AreaId = areaId;
             ObraId = obraId;
+            CiudadId = ciudadId;
             FechaInicio = fechaInicio;
             FechaFin = fechaFin;
             Comentarios = comentarios;

@@ -24,6 +24,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud
             request.Folio,
             request.AreaId,
             request.ObraId,
+            request.CiudadId,
             request.SolicitanteId,
             request.FechaInicio,
             request.FechaFin,
