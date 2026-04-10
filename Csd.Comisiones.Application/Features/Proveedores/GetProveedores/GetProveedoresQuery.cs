@@ -10,6 +10,8 @@ namespace Csd.Comisiones.Application.Features.Proveedores.GetProveedores
 {
     public class GetProveedoresQuery : IRequest<PagedResult<ProveedorDto>>
     {
+        public int? CiudadId { get; set; }
+        public int? TipoProveedorId { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }

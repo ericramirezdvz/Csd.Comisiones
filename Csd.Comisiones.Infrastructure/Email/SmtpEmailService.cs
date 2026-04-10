@@ -29,7 +29,7 @@ namespace Csd.Comisiones.Infrastructure.Email
         {
             var template = EmailTemplateHelper.LoadTemplate("SolicitudPendienteEmpleados.html");
 
-            var baseUrl = "http://localhost"; //_settings.BaseUrl;
+            var baseUrl = _settings.BaseUrl;
 
             var urlAprobar = $"{baseUrl}/api/solicitudes/{solicitudId}/approve";
             var urlRechazar = $"{baseUrl}/api/solicitudes/{solicitudId}/reject";
