@@ -14,7 +14,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.UpdateSolicitud
 
         public int AreaId { get; set; }
         public int ObraId { get; set; }
-
+        public int CiudadId { get; set; }
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
 
