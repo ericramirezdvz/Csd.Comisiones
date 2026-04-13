@@ -20,6 +20,7 @@ namespace Csd.Comisiones.Infrastructure.Email
 
         public async Task SendSolicitudPendienteAsync(
             int solicitudId,
+            int autorizadorId,
             string correo,
             string folio,
             string obra,
@@ -31,8 +32,8 @@ namespace Csd.Comisiones.Infrastructure.Email
 
             var baseUrl = _settings.BaseUrl;
 
-            var urlAprobar = $"{baseUrl}/api/solicitudes/{solicitudId}/approve";
-            var urlRechazar = $"{baseUrl}/api/solicitudes/{solicitudId}/reject";
+            var urlAprobar = $"{baseUrl}/api/solicitudes/{solicitudId}/aprobar";
+            var urlRechazar = $"{baseUrl}/api/solicitudes/{solicitudId}/rechazar-form?autorizadorId={autorizadorId}";
 
             var empleadosRows = string.Join("", empleados.Select(e => $@"
                 <tr style='text-align:center; border-bottom:1px solid #eee;'>

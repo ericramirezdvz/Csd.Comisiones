@@ -156,6 +156,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
 
                 return _emailService.SendSolicitudPendienteAsync(
                     solicitud.SolicitudId,
+                    a.AutorizadorId,
                     correo,
                     solicitud.Folio,
                     solicitud.ObraId.ToString(),

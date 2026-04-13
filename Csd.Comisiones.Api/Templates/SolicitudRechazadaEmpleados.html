@@ -1,64 +1,116 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html>
-<body style="margin:0; padding:0; background-color:#f4f6f8; font-family: Arial, sans-serif;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f8; padding:20px;">
-        <tr>
-            <td align="center">
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f8;
+      font-family: Arial, sans-serif;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f4f6f8; padding: 20px"
+    >
+      <tr>
+        <td align="center">
+          <!-- Contenedor -->
+          <table
+            width="800"
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              background: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            "
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                style="
+                  background: #0078d4;
+                  color: white;
+                  padding: 20px;
+                  text-align: center;
+                "
+              >
+                <h2 style="color: #dc3545">Solicitud Rechazada</h2>
+              </td>
+            </tr>
 
-                <!-- Contenedor -->
-                <table width="800" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+            <!-- Body -->
+            <tr>
+              <td style="padding: 20px; color: #333">
+                <p>
+                  La siguiente solicitud ha sido <strong>rechazada</strong>:
+                </p>
 
-                    <!-- Header -->
-                    <tr>
-                        <td style="background:#0078D4; color:white; padding:20px; text-align:center;">
-                            <h2 style="color:#dc3545;">Solicitud Rechazada</h2>
-                        </td>
+                <p>
+                  <strong>Folio:</strong> {{Folio}} <br />
+                  <strong>Obra:</strong> {{Obra}} <br />
+                  <strong>Fecha inicio:</strong> {{FechaInicio}} <br />
+                  <strong>Fecha fin:</strong> {{FechaFin}}
+                </p>
+
+                <div
+                  style="
+                    background-color: #fff3cd;
+                    border-left: 4px solid #ffc107;
+                    padding: 12px 15px;
+                    margin: 15px 0;
+                    border-radius: 4px;
+                  "
+                >
+                  <strong style="color: #856404">Motivo del rechazo:</strong>
+                  <p style="margin: 5px 0 0; color: #856404">{{Motivo}}</p>
+                </div>
+
+                <h3 style="margin-top: 30px">Empleados</h3>
+
+                <!-- Tabla -->
+                <table
+                  width="100%"
+                  border="0"
+                  cellpadding="10"
+                  cellspacing="0"
+                  style="border-collapse: collapse; margin-top: 10px"
+                >
+                  <thead>
+                    <tr
+                      style="
+                        background-color: #0078d4;
+                        color: white;
+                        text-align: center;
+                      "
+                    >
+                      <th>Nombre</th>
+                      <th>Fecha Inicio</th>
+                      <th>Fecha Fin</th>
+                      <th>Hotel</th>
+                      <th>Desayuno</th>
+                      <th>Almuerzo</th>
+                      <th>Cena</th>
+                      <th>Total</th>
                     </tr>
-
-                    <!-- Body -->
-                    <tr>
-                        <td style="padding:20px; color:#333;">
-
-                            <p>La siguiente solicitud ha sido <strong>rechazada</strong>:</p>
-
-                            <p>
-                                <strong>Folio:</strong> {{Folio}} <br />
-                                <strong>Obra:</strong> {{Obra}} <br />
-                                <strong>Fecha inicio:</strong> {{FechaInicio}} <br />
-                                <strong>Fecha fin:</strong> {{FechaFin}}
-                            </p>
-
-                            <h3 style="margin-top:30px;">Empleados</h3>
-
-                            <!-- Tabla -->
-                            <table width="100%" border="0" cellpadding="10" cellspacing="0" style="border-collapse: collapse; margin-top:10px;">
-                                <thead>
-                                    <tr style="background-color:#0078D4; color:white; text-align:center;">
-                                        <th>Nombre</th>
-                                        <th>Fecha Inicio</th>
-                                        <th>Fecha Fin</th>
-                                        <th>Hotel</th>
-                                        <th>Desayuno</th>
-                                        <th>Almuerzo</th>
-                                        <th>Cena</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{EmpleadosRows}}
-                                </tbody>
-                            </table>
-
-                            <!-- Botones -->
-                            <p style="margin-top:20px;">Si tienes dudas, favor de contactar al autorizador.</p>
-
-                        </td>
-                    </tr>
-
+                  </thead>
+                  <tbody>
+                    {{EmpleadosRows}}
+                  </tbody>
                 </table>
 
-            </td>
-        </tr>
+                <!-- Botones -->
+                <p style="margin-top: 20px">
+                  Si tienes dudas, favor de contactar al autorizador.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
     </table>
-</body>
+  </body>
 </html>

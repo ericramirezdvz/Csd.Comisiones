@@ -11,6 +11,7 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
     {
         Task SendSolicitudPendienteAsync(
             int solicitudId,
+            int autorizadorId,
             string correo,
             string folio,
             string obra,

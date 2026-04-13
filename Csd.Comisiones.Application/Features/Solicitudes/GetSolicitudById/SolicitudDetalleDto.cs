@@ -15,6 +15,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById
         public string ObraNombre { get; set; } = string.Empty;
 
         public int AreaId { get; set; }
+        public int? CiudadId { get; set; }
 
         public int EstatusSolicitudId { get; set; }
         public string EstatusNombre { get; set; } = string.Empty;

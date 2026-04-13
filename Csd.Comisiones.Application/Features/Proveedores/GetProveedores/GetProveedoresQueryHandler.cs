@@ -4,7 +4,6 @@ using Csd.Comisiones.Application.Contracts.Persistence;
 using Csd.Comisiones.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Csd.Comisiones.Application.Features.Proveedores.GetProveedores
 {
@@ -42,7 +41,16 @@ namespace Csd.Comisiones.Application.Features.Proveedores.GetProveedores
                 .Select(p => new ProveedorDto
                 {
                     ProveedorId = p.ProveedorId,
-                    Nombre = p.Nombre
+                    Nombre = p.Nombre,
+                    CiudadId = p.CiudadId,
+                    ProporcionaHospedaje = p.ProporcionaHospedaje,
+                    ProporcionaAlimentos = p.ProporcionaAlimentos,
+                    Servicios = p.Servicios.Select(s => new ProveedorServicioDto
+                    {
+                        TipoServicioId = (int)s.TipoServicio,
+                        TipoServicioNombre = s.TipoServicio.ToString(),
+                        Precio = s.Precio
+                    }).ToList()
                 })
                 .ToPagedResultAsync(
                     request.PageNumber,

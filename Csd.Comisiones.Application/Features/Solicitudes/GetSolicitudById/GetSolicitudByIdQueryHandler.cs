@@ -31,6 +31,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById
                     ObraNombre = s.Obra.Nombre,
 
                     AreaId = s.AreaId,
+                    CiudadId = s.CiudadId,
 
                     EstatusSolicitudId = s.EstatusSolicitudId,
                     EstatusNombre = s.Estatus.Nombre,
@@ -45,6 +46,12 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById
                         EmpleadoId = e.EmpleadoId,
                         NombreCompleto = e.Empleado.NombreCompleto,
                         NumeroEmpleado = e.Empleado.NumeroEmpleado,
+                        AreaId = e.Empleado.AreaId,
+                        Correo = e.Empleado.Correo,
+                        TipoAsignacion = (int)e.TipoAsignacion,
+                        MontoPago = e.MontoPago,
+                        FechaInicio = e.FechaInicio,
+                        FechaFin = e.FechaFin,
 
                         Hoteles = e.Hoteles.Select(h => new HotelSolicitudDto
                         {

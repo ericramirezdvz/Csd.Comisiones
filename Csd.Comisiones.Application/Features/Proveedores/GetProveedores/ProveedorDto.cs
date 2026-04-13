@@ -17,6 +17,7 @@ namespace Csd.Comisiones.Application.Features.Proveedores.GetProveedores
     {
         public int ProveedorId { get; set; }
         public string Nombre { get; set; } = string.Empty;
+        public int CiudadId { get; set; }
         public bool ProporcionaHospedaje { get; set; }
         public bool ProporcionaAlimentos { get; set; }
         public List<ProveedorServicioDto> Servicios { get; set; } = new();
