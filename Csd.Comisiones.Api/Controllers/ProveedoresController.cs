@@ -1,4 +1,5 @@
 ﻿using Csd.Comisiones.Application.Features.Proveedores.GetProveedores;
+using Csd.Comisiones.Application.Features.Proveedores.SendProveedores;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +23,13 @@ namespace Csd.Comisiones.Api.Controllers
             var result = await _mediator.Send(query);
 
             return Ok(result);
+        }
+
+        [HttpPost("{solicitudId}/enviar")]
+        public async Task<IActionResult> EnviarAProveedores(int solicitudId)
+        {
+            await _mediator.Send(new EnviarProveedoresCommand(solicitudId));
+            return Ok();
         }
     }
 }

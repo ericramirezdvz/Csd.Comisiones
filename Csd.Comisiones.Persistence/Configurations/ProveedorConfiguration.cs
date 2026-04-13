@@ -39,6 +39,10 @@ namespace Csd.Comisiones.Persistence.Configurations
             builder.Property(p => p.Activo)
                 .IsRequired();
 
+            builder.Property(p => p.Correo)
+                .IsRequired(false)
+                .HasMaxLength(200);
+
             builder.HasOne<Ciudad>()
                 .WithMany()
                 .HasForeignKey(p => p.CiudadId)

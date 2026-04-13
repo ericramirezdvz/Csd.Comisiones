@@ -22,6 +22,7 @@ namespace Csd.Comisiones.Domain.Entities
         public bool ProporcionaAlimentos { get; private set; }
 
         public bool Activo { get; private set; }
+        public string? Correo { get; set; }
 
         public ICollection<ProveedorServicio> Servicios { get; private set; } = new List<ProveedorServicio>();
 
@@ -32,7 +33,8 @@ namespace Csd.Comisiones.Domain.Entities
             TipoProveedorEnum tipoProveedor,
             int ciudadId,
             bool proporcionaHospedaje,
-            bool proporcionaAlimentos)
+            bool proporcionaAlimentos,
+            string? correo)
         {
             Nombre = nombre;
             TipoProveedor = tipoProveedor;
@@ -40,6 +42,7 @@ namespace Csd.Comisiones.Domain.Entities
             ProporcionaHospedaje = proporcionaHospedaje;
             ProporcionaAlimentos = proporcionaAlimentos;
             Activo = true;
+            Correo = correo;
         }
 
         public void Desactivar()

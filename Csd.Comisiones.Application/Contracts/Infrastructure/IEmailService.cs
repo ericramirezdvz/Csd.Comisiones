@@ -1,4 +1,5 @@
 ﻿using Csd.Comisiones.Application.Common.Models;
+using Csd.Comisiones.Application.Features.Proveedores.SendProveedores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,5 +36,11 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
             DateTime fechaFin,
             List<EmpleadoEmailDto> empleados,
             string? motivo);
+
+        Task SendSolicitudProveedorAsync(
+            string correo,
+            string proveedorNombre,
+            string folio,
+            List<ProveedorDetalleDto> detalles);
     }
 }

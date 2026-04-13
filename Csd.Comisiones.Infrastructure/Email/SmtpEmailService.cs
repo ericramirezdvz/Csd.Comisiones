@@ -1,5 +1,6 @@
 ﻿using Csd.Comisiones.Application.Common.Models;
 using Csd.Comisiones.Application.Contracts.Infrastructure;
+using Csd.Comisiones.Application.Features.Proveedores.SendProveedores;
 using Csd.Comisiones.Domain.Entities;
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -195,6 +196,48 @@ namespace Csd.Comisiones.Infrastructure.Email
 
             await smtp.SendAsync(email);
 
+            await smtp.DisconnectAsync(true);
+        }
+
+        public async Task SendSolicitudProveedorAsync(
+    string correo,
+    string proveedorNombre,
+    string folio,
+    List<ProveedorDetalleDto> detalles)
+        {
+            var template = EmailTemplateHelper.LoadTemplate("SolicitudProveedor.html");
+
+            var rows = string.Join("", detalles.Select(d => $@"
+        <tr>
+            <td>{d.NombreEmpleado}</td>
+            <td>{d.TipoServicio}</td>
+            <td>{d.FechaInicio:dd/MM/yyyy}</td>
+            <td>{d.FechaFin:dd/MM/yyyy}</td>
+        </tr>"));
+
+            var body = EmailTemplateHelper.Replace(template, new Dictionary<string, string>
+    {
+        { "Proveedor", proveedorNombre },
+        { "Folio", folio },
+        { "Rows", rows }
+    });
+
+            var email = new MimeMessage();
+
+            email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
+            email.To.Add(MailboxAddress.Parse(correo));
+            email.Subject = $"Nueva solicitud de servicio - {folio}";
+
+            var builder = new BodyBuilder { HtmlBody = body };
+            email.Body = builder.ToMessageBody();
+
+            using var smtp = new SmtpClient();
+
+            await smtp.ConnectAsync(_settings.Server, _settings.Port,
+                _settings.UseSSL ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto);
+
+            await smtp.AuthenticateAsync(_settings.Username, _settings.Password);
+            await smtp.SendAsync(email);
             await smtp.DisconnectAsync(true);
         }
     }
