@@ -60,6 +60,13 @@ namespace Csd.Comisiones.Persistence.Configurations
                 .HasForeignKey(x => x.CiudadId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // RELACIÓN CON MOTIVO SOLICITUD
+            builder
+                .HasOne(x => x.MotivoSolicitud)
+                .WithMany()
+                .HasForeignKey(x => x.MotivoSolicitudId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // RELACIÓN CON ESTATUS
             builder
                 .HasOne(x => x.Estatus)

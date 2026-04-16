@@ -15,6 +15,7 @@ namespace Csd.Comisiones.Domain.Entities
         public int AreaId { get; private set; }
         public int ObraId { get; private set; }
         public int? CiudadId { get; set; }
+        public int? MotivoSolicitudId { get; set; }
         public int SolicitanteId { get; private set; }
         public int EstatusSolicitudId { get; private set; }
         public DateTime FechaInicio { get; private set; }
@@ -24,6 +25,7 @@ namespace Csd.Comisiones.Domain.Entities
         public Area Area { get; private set; } = null!;
         public Obra Obra { get; private set; } = null!;
         public Ciudad Ciudad { get; private set; } = null!;
+        public MotivoSolicitud MotivoSolicitud { get; private set; } = null!;
         public EstatusSolicitud Estatus { get; private set; } = null!;
 
         private readonly List<SolicitudEmpleado> _empleados = new();

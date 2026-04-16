@@ -33,6 +33,7 @@ namespace Csd.Comisiones.Persistence
         public DbSet<SolicitudAutorizacion> SolicitudAutorizacion { get; set; }
         public DbSet<UbicacionAlimento> UbicacionAlimento { get; set; }
         public DbSet<RespuestaProveedor> RespuestaProveedor { get; set; }
+        public DbSet<MotivoSolicitud> MotivoSolicitud { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
