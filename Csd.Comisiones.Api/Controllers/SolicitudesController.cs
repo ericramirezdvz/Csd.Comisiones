@@ -1,4 +1,5 @@
 ﻿using Csd.Comisiones.Api.Dtos;
+using Csd.Comisiones.Application.Features.Solicitudes.ActualizarServicios;
 using Csd.Comisiones.Application.Features.Solicitudes.ApproveSolicitud;
 using Csd.Comisiones.Application.Features.Solicitudes.CancelSolicitud;
 using Csd.Comisiones.Application.Features.Solicitudes.CompleteSolicitud;
@@ -129,6 +130,18 @@ namespace Csd.Comisiones.Api.Controllers
             if (result == null)
                 return NotFound();
 
+            return Ok(result);
+        }
+
+        [HttpPut("{solicitudId}/empleados/{empleadoId}/servicios")]
+        public async Task<IActionResult> ActualizarServicios(
+            int solicitudId,
+            int empleadoId,
+            [FromBody] ActualizarServiciosEmpleadoCommand command)
+        {
+            command.SolicitudId = solicitudId;
+            command.EmpleadoId = empleadoId;
+            var result = await _mediator.Send(command);
             return Ok(result);
         }
 

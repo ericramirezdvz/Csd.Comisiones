@@ -1,5 +1,6 @@
 ﻿using Csd.Comisiones.Application.Contracts.Infrastructure;
 using Csd.Comisiones.Application.Contracts.Persistence;
+using Csd.Comisiones.Domain.Entities;
 using Csd.Comisiones.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -40,8 +41,18 @@ namespace Csd.Comisiones.Application.Features.Proveedores.SendProveedores
             if (solicitud == null)
                 throw new Exception("Solicitud no encontrada");
 
-            // Agrupar por proveedor
-            var proveedores = solicitud.Empleados
+            // Invalidar tokens anteriores para esta solicitud
+            var tokensAnteriores = await _context.RespuestaProveedor
+                .Where(r => r.SolicitudId == request.SolicitudId && r.Vigente)
+                .ToListAsync(cancellationToken);
+
+            foreach (var tokenAnterior in tokensAnteriores)
+            {
+                tokenAnterior.Invalidar();
+            }
+
+            // Agrupar por proveedor (solo servicios no cancelados con proveedor asignado)
+            var serviciosHotel = solicitud.Empleados
                 .SelectMany(e => e.Hoteles
                     .Where(h => h.ProveedorId != null && h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada)
                     .Select(h => new
@@ -50,28 +61,45 @@ namespace Csd.Comisiones.Application.Features.Proveedores.SendProveedores
                         Empleado = e,
                         Tipo = "Hotel",
                         FechaInicio = h.FechaInicio,
-                        FechaFin = h.FechaFin
-                    }))
-                .Concat(
-                    solicitud.Empleados
-                    .SelectMany(e => e.Comidas
-                        .Where(c => c.ProveedorId != null && c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada)
-                        .Select(c => new
-                        {
-                            Proveedor = c.Proveedor,
-                            Empleado = e,
-                            Tipo = "Comida",
-                            FechaInicio = c.FechaInicio,
-                            FechaFin = c.FechaFin
-                        }))
-                )
+                        FechaFin = h.FechaFin,
+                        Hotel = (SolicitudHotel?)h,
+                        Comida = (SolicitudComida?)null
+                    }));
+
+            var serviciosComida = solicitud.Empleados
+                .SelectMany(e => e.Comidas
+                    .Where(c => c.ProveedorId != null && c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada)
+                    .Select(c => new
+                    {
+                        Proveedor = c.Proveedor,
+                        Empleado = e,
+                        Tipo = "Comida",
+                        FechaInicio = c.FechaInicio,
+                        FechaFin = c.FechaFin,
+                        Hotel = (SolicitudHotel?)null,
+                        Comida = (SolicitudComida?)c
+                    }));
+
+            var proveedores = serviciosHotel
+                .Concat(serviciosComida)
                 .GroupBy(x => x.Proveedor.ProveedorId)
                 .ToList();
 
-            // Enviar correo por proveedor
+            // Generar token y enviar correo por proveedor
             foreach (var grupo in proveedores)
             {
                 var proveedor = grupo.First().Proveedor;
+
+                // Transicionar servicios a EnProceso
+                foreach (var servicio in grupo)
+                {
+                    servicio.Hotel?.EnviarAProveedor();
+                    servicio.Comida?.EnviarAProveedor();
+                }
+
+                // Crear token de respuesta
+                var respuesta = new RespuestaProveedor(request.SolicitudId, proveedor.ProveedorId);
+                _context.RespuestaProveedor.Add(respuesta);
 
                 if (string.IsNullOrEmpty(proveedor.Correo))
                     continue;
@@ -88,9 +116,12 @@ namespace Csd.Comisiones.Application.Features.Proveedores.SendProveedores
                     proveedor.Correo,
                     proveedor.Nombre,
                     solicitud.Folio,
-                    detalles
+                    detalles,
+                    respuesta.Token
                 );
             }
+
+            await ((DbContext)_context).SaveChangesAsync(cancellationToken);
 
             return Unit.Value;
         }

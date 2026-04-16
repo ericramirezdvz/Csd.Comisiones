@@ -65,9 +65,36 @@ namespace Csd.Comisiones.Domain.Entities
             ProveedorId = proveedorId;
         }
 
+        public void EnviarAProveedor()
+        {
+            EstatusDetalleId = (int)EstatusDetalleEnum.EnProceso;
+        }
+
+        public void AceptarPorProveedor()
+        {
+            if (EstatusDetalleId != (int)EstatusDetalleEnum.EnProceso)
+                throw new InvalidOperationException("Solo se puede aceptar un servicio en proceso");
+
+            EstatusDetalleId = (int)EstatusDetalleEnum.Aprobada;
+        }
+
+        public void RechazarPorProveedor()
+        {
+            if (EstatusDetalleId != (int)EstatusDetalleEnum.EnProceso)
+                throw new InvalidOperationException("Solo se puede rechazar un servicio en proceso");
+
+            EstatusDetalleId = (int)EstatusDetalleEnum.Rechazada;
+        }
+
+        public void ReasignarProveedor(int nuevoProveedorId)
+        {
+            ProveedorId = nuevoProveedorId;
+            EstatusDetalleId = (int)EstatusDetalleEnum.Borrador;
+        }
+
         public void Cancelar()
         {
-            EstatusDetalleId = (int)EstatusDetalleEnum.Cancelada; // Cancelado
+            EstatusDetalleId = (int)EstatusDetalleEnum.Cancelada;
         }
     }
 }

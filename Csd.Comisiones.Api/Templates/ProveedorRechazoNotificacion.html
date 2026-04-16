@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f8;
+      font-family: Arial, sans-serif;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f4f6f8; padding: 20px"
+    >
+      <tr>
+        <td align="center">
+          <table
+            width="600"
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              background: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            "
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                style="
+                  background: #dc3545;
+                  color: white;
+                  padding: 20px;
+                  text-align: center;
+                "
+              >
+                <h2 style="margin: 0">⚠️ Proveedor rechazó servicios</h2>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td style="padding: 30px; color: #333">
+                <p>
+                  El proveedor <strong>{{Proveedor}}</strong> ha
+                  <strong style="color: #dc3545">rechazado</strong> los
+                  servicios de la solicitud <strong>{{Folio}}</strong>.
+                </p>
+
+                <table
+                  width="100%"
+                  cellpadding="8"
+                  cellspacing="0"
+                  style="
+                    margin: 15px 0;
+                    border-collapse: collapse;
+                    background: #fff3cd;
+                    border-radius: 4px;
+                  "
+                >
+                  <tr>
+                    <td style="font-weight: bold; color: #856404">
+                      Motivo del rechazo:
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="color: #856404; font-style: italic">
+                      "{{Motivo}}"
+                    </td>
+                  </tr>
+                </table>
+
+                <p style="margin-top: 20px">
+                  Es necesario reasignar un nuevo proveedor para los servicios
+                  afectados. Ingrese al sistema para gestionar la reasignación.
+                </p>
+
+                <p
+                  style="
+                    color: #888;
+                    font-size: 12px;
+                    margin-top: 25px;
+                    text-align: center;
+                  "
+                >
+                  Este correo fue generado automáticamente por el sistema de
+                  comisiones de DIAVAZ.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

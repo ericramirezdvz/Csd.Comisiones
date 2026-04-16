@@ -1,18 +1,173 @@
-﻿<h2>Nueva solicitud de servicio</h2>
+﻿<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f8;
+      font-family: Arial, sans-serif;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f4f6f8; padding: 20px"
+    >
+      <tr>
+        <td align="center">
+          <table
+            width="600"
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              background: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            "
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                style="
+                  background: #06205c;
+                  color: white;
+                  padding: 20px;
+                  text-align: center;
+                "
+              >
+                <h2 style="margin: 0">Nueva solicitud de servicio</h2>
+              </td>
+            </tr>
 
-<p>Proveedor: <strong>{{Proveedor}}</strong></p>
-<p>Folio: <strong>{{Folio}}</strong></p>
+            <!-- Body -->
+            <tr>
+              <td style="padding: 30px; color: #333">
+                <p>Estimado(a) <strong>{{Proveedor}}</strong>,</p>
+                <p>
+                  Se ha generado una nueva solicitud de servicios con folio
+                  <strong>{{Folio}}</strong>. A continuación el detalle:
+                </p>
 
-<table border="1" cellpadding="8" cellspacing="0">
-    <thead>
-        <tr>
-            <th>Empleado</th>
-            <th>Servicio</th>
-            <th>Inicio</th>
-            <th>Fin</th>
-        </tr>
-    </thead>
-    <tbody>
-        {{Rows}}
-    </tbody>
-</table>
+                <table
+                  width="100%"
+                  cellpadding="8"
+                  cellspacing="0"
+                  style="
+                    border-collapse: collapse;
+                    margin: 15px 0;
+                    font-size: 14px;
+                  "
+                >
+                  <thead>
+                    <tr style="background: #f0f0f0">
+                      <th
+                        style="
+                          text-align: left;
+                          border-bottom: 2px solid #ddd;
+                          padding: 10px 8px;
+                        "
+                      >
+                        Empleado
+                      </th>
+                      <th
+                        style="
+                          text-align: left;
+                          border-bottom: 2px solid #ddd;
+                          padding: 10px 8px;
+                        "
+                      >
+                        Servicio
+                      </th>
+                      <th
+                        style="
+                          text-align: center;
+                          border-bottom: 2px solid #ddd;
+                          padding: 10px 8px;
+                        "
+                      >
+                        Inicio
+                      </th>
+                      <th
+                        style="
+                          text-align: center;
+                          border-bottom: 2px solid #ddd;
+                          padding: 10px 8px;
+                        "
+                      >
+                        Fin
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{Rows}}
+                  </tbody>
+                </table>
+
+                <p style="margin-top: 25px; font-size: 14px">
+                  Por favor confirme si acepta o rechaza esta solicitud:
+                </p>
+
+                <!-- Botones Aceptar / Rechazar -->
+                <table width="100%" style="margin-top: 10px">
+                  <tr>
+                    <td align="center" style="padding: 5px">
+                      <a
+                        href="{{UrlAceptar}}"
+                        style="
+                          display: inline-block;
+                          background-color: #28a745;
+                          color: white;
+                          padding: 14px 40px;
+                          text-decoration: none;
+                          border-radius: 5px;
+                          font-size: 16px;
+                          font-weight: bold;
+                        "
+                      >
+                        ✅ Aceptar servicios
+                      </a>
+                    </td>
+                    <td align="center" style="padding: 5px">
+                      <a
+                        href="{{UrlRechazar}}"
+                        style="
+                          display: inline-block;
+                          background-color: #dc3545;
+                          color: white;
+                          padding: 14px 40px;
+                          text-decoration: none;
+                          border-radius: 5px;
+                          font-size: 16px;
+                          font-weight: bold;
+                        "
+                      >
+                        ❌ Rechazar servicios
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+
+                <p
+                  style="
+                    color: #888;
+                    font-size: 12px;
+                    margin-top: 25px;
+                    text-align: center;
+                  "
+                >
+                  Este correo fue generado automáticamente por el sistema de
+                  comisiones de DIAVAZ.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

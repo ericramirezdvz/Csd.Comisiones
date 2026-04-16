@@ -69,8 +69,9 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
             await _solicitudRepository.UpdateAsync(solicitud);
             await _solicitudRepository.SaveChangesAsync(cancellationToken);
 
-            // CALCULAR LOS PRECIOS MAXIMOS PARA CADA SERVICIO
+            // CALCULAR LOS PRECIOS MAXIMOS PARA CADA SERVICIO (solo proveedores de la ciudad de la comisión)
             var preciosMaximos = await _context.ProveedorServicio
+                .Where(x => x.Proveedor.CiudadId == solicitud.CiudadId && x.Proveedor.Activo)
                 .GroupBy(x => x.TipoServicio)
                 .Select(g => new
                 {

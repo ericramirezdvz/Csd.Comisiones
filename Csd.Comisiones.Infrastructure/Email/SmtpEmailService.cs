@@ -203,23 +203,30 @@ namespace Csd.Comisiones.Infrastructure.Email
     string correo,
     string proveedorNombre,
     string folio,
-    List<ProveedorDetalleDto> detalles)
+    List<ProveedorDetalleDto> detalles,
+    Guid token)
         {
             var template = EmailTemplateHelper.LoadTemplate("SolicitudProveedor.html");
 
+            var baseUrl = _settings.BaseUrl;
+            var urlAceptar = $"{baseUrl}/api/proveedores/respuesta/{token}/aceptar";
+            var urlRechazar = $"{baseUrl}/api/proveedores/respuesta/{token}/rechazar-form";
+
             var rows = string.Join("", detalles.Select(d => $@"
-        <tr>
-            <td>{d.NombreEmpleado}</td>
-            <td>{d.TipoServicio}</td>
-            <td>{d.FechaInicio:dd/MM/yyyy}</td>
-            <td>{d.FechaFin:dd/MM/yyyy}</td>
+        <tr style='border-bottom: 1px solid #eee;'>
+            <td style='padding: 8px;'>{d.NombreEmpleado}</td>
+            <td style='padding: 8px;'>{d.TipoServicio}</td>
+            <td style='padding: 8px; text-align: center;'>{d.FechaInicio:dd/MM/yyyy}</td>
+            <td style='padding: 8px; text-align: center;'>{d.FechaFin:dd/MM/yyyy}</td>
         </tr>"));
 
             var body = EmailTemplateHelper.Replace(template, new Dictionary<string, string>
     {
         { "Proveedor", proveedorNombre },
         { "Folio", folio },
-        { "Rows", rows }
+        { "Rows", rows },
+        { "UrlAceptar", urlAceptar },
+        { "UrlRechazar", urlRechazar }
     });
 
             var email = new MimeMessage();
@@ -227,6 +234,41 @@ namespace Csd.Comisiones.Infrastructure.Email
             email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
             email.To.Add(MailboxAddress.Parse(correo));
             email.Subject = $"Nueva solicitud de servicio - {folio}";
+
+            var builder = new BodyBuilder { HtmlBody = body };
+            email.Body = builder.ToMessageBody();
+
+            using var smtp = new SmtpClient();
+
+            await smtp.ConnectAsync(_settings.Server, _settings.Port,
+                _settings.UseSSL ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto);
+
+            await smtp.AuthenticateAsync(_settings.Username, _settings.Password);
+            await smtp.SendAsync(email);
+            await smtp.DisconnectAsync(true);
+        }
+
+        public async Task SendProveedorRechazoNotificacionAsync(
+            string folio,
+            string proveedorNombre,
+            string motivo)
+        {
+            var template = EmailTemplateHelper.LoadTemplate("ProveedorRechazoNotificacion.html");
+
+            var body = EmailTemplateHelper.Replace(template, new Dictionary<string, string>
+            {
+                { "Proveedor", proveedorNombre },
+                { "Folio", folio },
+                { "Motivo", motivo }
+            });
+
+            var correoDestino = _settings.SenderEmail;
+
+            var email = new MimeMessage();
+
+            email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
+            email.To.Add(MailboxAddress.Parse(correoDestino));
+            email.Subject = $"⚠️ Proveedor rechazó servicios - {folio}";
 
             var builder = new BodyBuilder { HtmlBody = body };
             email.Body = builder.ToMessageBody();

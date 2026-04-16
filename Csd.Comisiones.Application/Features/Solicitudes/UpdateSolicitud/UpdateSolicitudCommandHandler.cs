@@ -38,10 +38,16 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.UpdateSolicitud
 
             foreach (var empleadoDto in request.Empleados)
             {
-                var solicitudEmpleado = new SolicitudEmpleado(
-                    empleadoDto.EmpleadoId,
-                    empleadoDto.FechaInicio,
-                    empleadoDto.FechaFin);
+                var solicitudEmpleado = empleadoDto.TipoAsignacion == 2 && empleadoDto.MontoPago.HasValue
+                    ? SolicitudEmpleado.CrearPago(
+                        empleadoDto.EmpleadoId,
+                        empleadoDto.FechaInicio,
+                        empleadoDto.FechaFin,
+                        empleadoDto.MontoPago.Value)
+                    : new SolicitudEmpleado(
+                        empleadoDto.EmpleadoId,
+                        empleadoDto.FechaInicio,
+                        empleadoDto.FechaFin);
 
                 // Hoteles
                 foreach (var hotelDto in empleadoDto.Hoteles)

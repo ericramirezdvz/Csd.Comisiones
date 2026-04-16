@@ -31,6 +31,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById
                     ObraNombre = s.Obra.Nombre,
 
                     AreaId = s.AreaId,
+                    AreaNombre = s.Area.Nombre,
                     CiudadId = s.CiudadId,
 
                     EstatusSolicitudId = s.EstatusSolicitudId,
@@ -38,6 +39,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById
 
                     FechaInicio = s.FechaInicio,
                     FechaFin = s.FechaFin,
+                    FechaCreacion = s.FechaCreacion,
 
                     Comentarios = s.Comentarios,
 

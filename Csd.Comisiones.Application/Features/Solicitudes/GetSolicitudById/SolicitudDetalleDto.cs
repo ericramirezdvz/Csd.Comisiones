@@ -15,6 +15,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById
         public string ObraNombre { get; set; } = string.Empty;
 
         public int AreaId { get; set; }
+        public string AreaNombre { get; set; } = string.Empty;
         public int? CiudadId { get; set; }
 
         public int EstatusSolicitudId { get; set; }
@@ -22,6 +23,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById
 
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
+        public DateTime FechaCreacion { get; set; }
 
         public string? Comentarios { get; set; }
 

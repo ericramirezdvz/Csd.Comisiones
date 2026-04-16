@@ -1,34 +1,84 @@
-﻿using Csd.Comisiones.Application.Contracts.Persistence;
+﻿using Csd.Comisiones.Application.Contracts.Infrastructure;
+using Csd.Comisiones.Application.Contracts.Persistence;
+using Csd.Comisiones.Application.Features.Proveedores.SendProveedores;
+using Csd.Comisiones.Domain.Entities;
+using Csd.Comisiones.Domain.Enums;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Csd.Comisiones.Application.Features.Solicitudes.CompleteSolicitud
 {
     public class CompletarSolicitudCommandHandler : IRequestHandler<CompletarSolicitudCommand, Unit>
     {
-        private readonly ISolicitudRepository _repository;
+        private readonly IApplicationDbContext _context;
+        private readonly IEmailService _emailService;
 
-        public CompletarSolicitudCommandHandler(ISolicitudRepository repository)
+        public CompletarSolicitudCommandHandler(IApplicationDbContext context, IEmailService emailService)
         {
-            _repository = repository;
+            _context = context;
+            _emailService = emailService;
         }
 
         public async Task<Unit> Handle(CompletarSolicitudCommand request, CancellationToken cancellationToken)
         {
-            var solicitud = await _repository.GetByIdAsync(request.SolicitudId);
+            var solicitud = await _context.Solicitud
+                .Include(x => x.Empleados).ThenInclude(e => e.Empleado)
+                .Include(x => x.Empleados).ThenInclude(e => e.Hoteles).ThenInclude(h => h.Proveedor)
+                .Include(x => x.Empleados).ThenInclude(e => e.Comidas).ThenInclude(c => c.Proveedor)
+                .FirstOrDefaultAsync(x => x.SolicitudId == request.SolicitudId, cancellationToken);
 
             if (solicitud == null)
                 throw new Exception("Solicitud no encontrada");
 
             solicitud.Terminar();
 
-            await _repository.UpdateAsync(solicitud);
-            await _repository.SaveChangesAsync(cancellationToken);
+            // Invalidar tokens anteriores
+            var tokensAnteriores = await _context.RespuestaProveedor
+                .Where(r => r.SolicitudId == request.SolicitudId && r.Vigente)
+                .ToListAsync(cancellationToken);
 
+            foreach (var token in tokensAnteriores)
+                token.Invalidar();
+
+            // Agrupar servicios activos por proveedor para conciliación
+            var serviciosHotel = solicitud.Empleados
+                .SelectMany(e => e.Hoteles
+                    .Where(h => h.ProveedorId != null && h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada)
+                    .Select(h => new { Proveedor = h.Proveedor, Empleado = e, Tipo = "Hotel",
+                        FechaInicio = h.FechaInicio, FechaFin = h.FechaFin }));
+
+            var serviciosComida = solicitud.Empleados
+                .SelectMany(e => e.Comidas
+                    .Where(c => c.ProveedorId != null && c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada)
+                    .Select(c => new { Proveedor = c.Proveedor, Empleado = e, Tipo = "Comida",
+                        FechaInicio = c.FechaInicio, FechaFin = c.FechaFin }));
+
+            var proveedores = serviciosHotel.Concat(serviciosComida)
+                .GroupBy(x => x.Proveedor.ProveedorId).ToList();
+
+            foreach (var grupo in proveedores)
+            {
+                var proveedor = grupo.First().Proveedor;
+
+                var respuesta = new RespuestaProveedor(request.SolicitudId, proveedor.ProveedorId);
+                _context.RespuestaProveedor.Add(respuesta);
+
+                if (string.IsNullOrEmpty(proveedor.Correo)) continue;
+
+                var detalles = grupo.Select(x => new ProveedorDetalleDto
+                {
+                    NombreEmpleado = x.Empleado.Empleado.NombreCompleto,
+                    TipoServicio = x.Tipo,
+                    FechaInicio = x.FechaInicio,
+                    FechaFin = x.FechaFin
+                }).ToList();
+
+                await _emailService.SendSolicitudProveedorAsync(
+                    proveedor.Correo, proveedor.Nombre, solicitud.Folio,
+                    detalles, respuesta.Token);
+            }
+
+            await ((DbContext)_context).SaveChangesAsync(cancellationToken);
             return Unit.Value;
         }
     }

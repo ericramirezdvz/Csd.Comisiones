@@ -19,7 +19,6 @@
     >
       <tr>
         <td align="center">
-          <!-- Contenedor -->
           <table
             width="600"
             cellpadding="0"
@@ -35,20 +34,23 @@
             <tr>
               <td
                 style="
-                  background: #0078d4;
+                  background: #dc3545;
                   color: white;
                   padding: 20px;
                   text-align: center;
                 "
               >
-                <h2 style="margin: 0">Rechazar Solicitud</h2>
+                <h2 style="margin: 0">Rechazar Servicios</h2>
               </td>
             </tr>
 
             <!-- Body -->
             <tr>
               <td style="padding: 30px; color: #333">
-                <p>Estás a punto de rechazar la siguiente solicitud:</p>
+                <p>
+                  <strong>{{Proveedor}}</strong>, está a punto de rechazar los
+                  servicios de la solicitud:
+                </p>
 
                 <table
                   width="100%"
@@ -95,7 +97,7 @@
                     name="comentarios"
                     rows="4"
                     required
-                    placeholder="Indica el motivo por el cual se rechaza esta solicitud..."
+                    placeholder="Indique el motivo por el cual rechaza estos servicios..."
                     style="
                       width: 100%;
                       padding: 10px;

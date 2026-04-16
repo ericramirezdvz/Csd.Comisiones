@@ -41,6 +41,12 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
             string correo,
             string proveedorNombre,
             string folio,
-            List<ProveedorDetalleDto> detalles);
+            List<ProveedorDetalleDto> detalles,
+            Guid token);
+
+        Task SendProveedorRechazoNotificacionAsync(
+            string folio,
+            string proveedorNombre,
+            string motivo);
     }
 }
