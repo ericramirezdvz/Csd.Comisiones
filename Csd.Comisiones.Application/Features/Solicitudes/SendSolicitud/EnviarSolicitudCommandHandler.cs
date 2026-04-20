@@ -83,41 +83,114 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
             decimal GetPrecioMax(TipoServicioEnum tipoServicio) =>
             preciosMaximos.TryGetValue(tipoServicio, out var precio) ? precio : 0;
 
+            // Determinar tipos de servicio desde metadata en comentarios
+            var comentarios = solicitud.Comentarios ?? "";
+            var metaMatch = System.Text.RegularExpressions.Regex.Match(comentarios, @"##META:tiposServicio=([A-Z,]+)");
+            var tiposServicio = metaMatch.Success
+                ? metaMatch.Groups[1].Value.Split(',').ToHashSet()
+                : new HashSet<string> { "HOSPEDAJE", "COMIDA" }; // default
+
+            // Fallback: formato legacy ##META:tipoServicio=HOSPEDAJE_COMIDA
+            if (!metaMatch.Success)
+            {
+                var legacyMatch = System.Text.RegularExpressions.Regex.Match(comentarios, @"##META:tipoServicio=(HOSPEDAJE_COMIDA|HOSPEDAJE|COMIDA|PAGO)");
+                if (legacyMatch.Success)
+                {
+                    var val = legacyMatch.Groups[1].Value;
+                    tiposServicio = val == "HOSPEDAJE_COMIDA"
+                        ? new HashSet<string> { "HOSPEDAJE", "COMIDA" }
+                        : new HashSet<string> { val };
+                }
+            }
+
+            var incluyeHospedaje = tiposServicio.Contains("HOSPEDAJE");
+            var incluyeComida = tiposServicio.Contains("COMIDA");
+
             // ARMANDO EL EMAIL PARA LOS AUTORIZADORES
             var empleadosEmail = solicitud.Empleados
             .Select(e =>
             {
+                // PAGO DIRECTO: usar el monto exacto, sin estimación de servicios
+                if (e.TipoAsignacion == TipoAsignacionEnum.Pago)
+                {
+                    return new EmpleadoEmailDto
+                    {
+                        Nombre = e.Empleado.NombreCompleto,
+                        FechaInicio = e.FechaInicio,
+                        FechaFin = e.FechaFin,
+                        RequiereHotel = false,
+                        Desayuno = false,
+                        Almuerzo = false,
+                        Cena = false,
+                        Total = e.MontoPago ?? 0,
+                        EsPago = true
+                    };
+                }
+
+                // SERVICIOS: estimar con precios máximos de la ciudad
                 var hotelesActivos = e.Hoteles
                     .Where(h => h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada);
 
                 var comidasActivas = e.Comidas
                     .Where(c => c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada);
 
-                // HOTEL
-                //var totalHotel = hotelesActivos.Sum(h =>
-                //{
-                //    var noches = (h.FechaFin - h.FechaInicio).Days;
-                //    return noches * h.PrecioUnitario;
-                //});
-                var totalHotel = hotelesActivos.Sum(h =>
+                var tieneHoteles = hotelesActivos.Any();
+                var tieneComidas = comidasActivas.Any();
+
+                decimal totalHotel;
+                decimal totalComida;
+                bool requiereHotel;
+                bool desayuno;
+                bool almuerzo;
+                bool cena;
+
+                if (tieneHoteles || tieneComidas)
                 {
-                    var noches = (h.FechaFin - h.FechaInicio).Days;
+                    // Ya hay servicios asignados: calcular con datos reales
+                    totalHotel = hotelesActivos.Sum(h =>
+                    {
+                        var noches = (h.FechaFin - h.FechaInicio).Days;
+                        var tipoServicio = h.TipoHabitacionId == (int)TipoServicioEnum.HabitacionSencilla
+                            ? (int)TipoServicioEnum.HabitacionSencilla
+                            : (int)TipoServicioEnum.HabitacionDoble;
+                        var precioMax = GetPrecioMax((TipoServicioEnum)tipoServicio);
+                        return noches * precioMax;
+                    });
 
-                    var tipoServicio = h.TipoHabitacionId == (int)TipoServicioEnum.HabitacionSencilla
-                        ? (int)TipoServicioEnum.HabitacionSencilla
-                        : (int)TipoServicioEnum.HabitacionDoble;
+                    var precioAlimentoMax = GetPrecioMax(TipoServicioEnum.Alimento);
+                    totalComida = comidasActivas.Count() * precioAlimentoMax;
 
-                    var precioMax = GetPrecioMax((TipoServicioEnum)tipoServicio);
+                    requiereHotel = tieneHoteles;
+                    desayuno = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Desayuno);
+                    almuerzo = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Almuerzo);
+                    cena = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Cena);
+                }
+                else
+                {
+                    // Sin servicios aún: estimar según tipoServicio de la comisión
+                    var dias = (e.FechaFin - e.FechaInicio).Days;
+                    var noches = Math.Max(dias - 1, 0);
 
-                    return noches * precioMax;
-                });
+                    totalHotel = 0;
+                    requiereHotel = incluyeHospedaje;
+                    if (incluyeHospedaje && noches > 0)
+                    {
+                        var precioHotel = GetPrecioMax(TipoServicioEnum.HabitacionSencilla);
+                        totalHotel = noches * precioHotel;
+                    }
 
+                    totalComida = 0;
+                    desayuno = incluyeComida;
+                    almuerzo = incluyeComida;
+                    cena = incluyeComida;
+                    if (incluyeComida && dias > 0)
+                    {
+                        var precioAlimento = GetPrecioMax(TipoServicioEnum.Alimento);
+                        // 3 comidas por día (desayuno, comida, cena)
+                        totalComida = dias * 3 * precioAlimento;
+                    }
+                }
 
-                // COMIDA
-                //var totalComida = comidasActivas.Sum(c => c.PrecioUnitario);
-                var precioAlimentoMax = GetPrecioMax(TipoServicioEnum.Alimento);
-                var totalComida = comidasActivas.Count() * precioAlimentoMax;
-                
                 var total = totalHotel + totalComida;
 
                 return new EmpleadoEmailDto
@@ -126,11 +199,11 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
                     FechaInicio = e.FechaInicio,
                     FechaFin = e.FechaFin,
 
-                    RequiereHotel = hotelesActivos.Any(),
+                    RequiereHotel = requiereHotel,
 
-                    Desayuno = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Desayuno),
-                    Almuerzo = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Almuerzo),
-                    Cena = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Cena),
+                    Desayuno = desayuno,
+                    Almuerzo = almuerzo,
+                    Cena = cena,
 
                     Total = total
                 };

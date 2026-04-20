@@ -23,6 +23,7 @@ namespace Csd.Comisiones.Infrastructure
 
             services.AddTransient<IEmailService, SmtpEmailService>();
             services.AddTransient<IFileParserService, FileParserService>();
+            services.AddTransient<ISolpedExcelService, SolpedExcelService>();
 
             return services;
         }

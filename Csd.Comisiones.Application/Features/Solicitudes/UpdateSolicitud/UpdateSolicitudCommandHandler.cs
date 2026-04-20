@@ -32,7 +32,8 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.UpdateSolicitud
                 request.CiudadId,
                 request.FechaInicio,
                 request.FechaFin,
-                request.Comentarios);
+                request.Comentarios,
+                request.MotivoSolicitudId);
 
             solicitud.LimpiarEmpleados();
 

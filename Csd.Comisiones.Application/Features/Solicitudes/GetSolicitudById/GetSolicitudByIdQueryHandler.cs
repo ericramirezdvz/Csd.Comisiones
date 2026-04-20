@@ -43,6 +43,9 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById
 
                     Comentarios = s.Comentarios,
 
+                    MotivoSolicitudId = s.MotivoSolicitudId,
+                    MotivoSolicitudNombre = s.MotivoSolicitud != null ? s.MotivoSolicitud.Nombre : null,
+
                     Empleados = s.Empleados.Select(e => new EmpleadoSolicitudDto
                     {
                         EmpleadoId = e.EmpleadoId,

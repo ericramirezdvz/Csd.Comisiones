@@ -56,40 +56,97 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.RejectSolicitud
 
             await _solicitudRepository.SaveChangesAsync(cancellationToken);
 
+            // Precios máximos de la ciudad para estimación
+            var preciosMaximos = await _context.ProveedorServicio
+                .Where(x => x.Proveedor.CiudadId == solicitud.CiudadId && x.Proveedor.Activo)
+                .GroupBy(x => x.TipoServicio)
+                .Select(g => new { TipoServicio = g.Key, PrecioMaximo = g.Max(x => x.Precio) })
+                .ToDictionaryAsync(x => x.TipoServicio, x => x.PrecioMaximo, cancellationToken);
+
+            decimal GetPrecioMax(TipoServicioEnum ts) =>
+                preciosMaximos.TryGetValue(ts, out var p) ? p : 0;
+
+            // Tipos de servicio desde metadata
+            var comentarios = solicitud.Comentarios ?? "";
+            var metaMatch = System.Text.RegularExpressions.Regex.Match(comentarios, @"##META:tiposServicio=([A-Z,]+)");
+            var tiposServicio = metaMatch.Success
+                ? metaMatch.Groups[1].Value.Split(',').ToHashSet()
+                : new HashSet<string> { "HOSPEDAJE", "COMIDA" };
+            if (!metaMatch.Success)
+            {
+                var legacy = System.Text.RegularExpressions.Regex.Match(comentarios, @"##META:tipoServicio=(HOSPEDAJE_COMIDA|HOSPEDAJE|COMIDA|PAGO)");
+                if (legacy.Success)
+                    tiposServicio = legacy.Groups[1].Value == "HOSPEDAJE_COMIDA"
+                        ? new HashSet<string> { "HOSPEDAJE", "COMIDA" }
+                        : new HashSet<string> { legacy.Groups[1].Value };
+            }
+            var incluyeHospedaje = tiposServicio.Contains("HOSPEDAJE");
+            var incluyeComida = tiposServicio.Contains("COMIDA");
+
             var empleadosEmail = solicitud.Empleados
                 .Select(e =>
                 {
+                    if (e.TipoAsignacion == TipoAsignacionEnum.Pago)
+                    {
+                        return new EmpleadoEmailDto
+                        {
+                            Nombre = e.Empleado.NombreCompleto,
+                            FechaInicio = e.FechaInicio,
+                            FechaFin = e.FechaFin,
+                            RequiereHotel = false,
+                            Desayuno = false,
+                            Almuerzo = false,
+                            Cena = false,
+                            Total = e.MontoPago ?? 0,
+                            EsPago = true
+                        };
+                    }
+
                     var hotelesActivos = e.Hoteles
                         .Where(h => h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada);
-
                     var comidasActivas = e.Comidas
                         .Where(c => c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada);
 
-                    var totalHotel = hotelesActivos.Sum(h =>
+                    decimal totalHotel;
+                    decimal totalComida;
+                    bool requiereHotel;
+                    bool desayuno, almuerzo, cena;
+
+                    if (hotelesActivos.Any() || comidasActivas.Any())
                     {
-                        var noches = (h.FechaFin - h.FechaInicio).Days;
-                        return noches * h.PrecioUnitario;
-                    });
-
-                    var totalComida = comidasActivas.Sum(c => c.PrecioUnitario);
-
-                    var total = e.TipoAsignacion == TipoAsignacionEnum.Pago
-                        ? e.MontoPago ?? 0
-                        : totalHotel + totalComida;
+                        totalHotel = hotelesActivos.Sum(h =>
+                        {
+                            var noches = (h.FechaFin - h.FechaInicio).Days;
+                            return noches * h.PrecioUnitario;
+                        });
+                        totalComida = comidasActivas.Sum(c => c.PrecioUnitario);
+                        requiereHotel = hotelesActivos.Any();
+                        desayuno = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Desayuno);
+                        almuerzo = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Almuerzo);
+                        cena = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Cena);
+                    }
+                    else
+                    {
+                        var dias = (e.FechaFin - e.FechaInicio).Days;
+                        var noches = Math.Max(dias - 1, 0);
+                        totalHotel = incluyeHospedaje && noches > 0 ? noches * GetPrecioMax(TipoServicioEnum.HabitacionSencilla) : 0;
+                        totalComida = incluyeComida && dias > 0 ? dias * 3 * GetPrecioMax(TipoServicioEnum.Alimento) : 0;
+                        requiereHotel = incluyeHospedaje;
+                        desayuno = incluyeComida;
+                        almuerzo = incluyeComida;
+                        cena = incluyeComida;
+                    }
 
                     return new EmpleadoEmailDto
                     {
                         Nombre = e.Empleado.NombreCompleto,
                         FechaInicio = e.FechaInicio,
                         FechaFin = e.FechaFin,
-
-                        RequiereHotel = hotelesActivos.Any(),
-
-                        Desayuno = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Desayuno),
-                        Almuerzo = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Almuerzo),
-                        Cena = comidasActivas.Any(c => c.TipoComidaId == (int)TipoComidaEnum.Cena),
-
-                        Total = total
+                        RequiereHotel = requiereHotel,
+                        Desayuno = desayuno,
+                        Almuerzo = almuerzo,
+                        Cena = cena,
+                        Total = totalHotel + totalComida
                     };
                 })
                 .ToList();

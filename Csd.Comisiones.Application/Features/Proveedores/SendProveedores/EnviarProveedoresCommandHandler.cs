@@ -59,9 +59,10 @@ namespace Csd.Comisiones.Application.Features.Proveedores.SendProveedores
                     {
                         Proveedor = h.Proveedor,
                         Empleado = e,
-                        Tipo = "Hotel",
+                        Tipo = h.TipoHabitacionId == 2 ? "Hospedaje - Doble" : "Hospedaje - Sencilla",
                         FechaInicio = h.FechaInicio,
                         FechaFin = h.FechaFin,
+                        Precio = h.PrecioUnitario,
                         Hotel = (SolicitudHotel?)h,
                         Comida = (SolicitudComida?)null
                     }));
@@ -73,9 +74,10 @@ namespace Csd.Comisiones.Application.Features.Proveedores.SendProveedores
                     {
                         Proveedor = c.Proveedor,
                         Empleado = e,
-                        Tipo = "Comida",
+                        Tipo = c.TipoComidaId == 1 ? "Desayuno" : c.TipoComidaId == 2 ? "Comida" : "Cena",
                         FechaInicio = c.FechaInicio,
                         FechaFin = c.FechaFin,
+                        Precio = c.PrecioUnitario,
                         Hotel = (SolicitudHotel?)null,
                         Comida = (SolicitudComida?)c
                     }));
@@ -109,7 +111,8 @@ namespace Csd.Comisiones.Application.Features.Proveedores.SendProveedores
                     NombreEmpleado = x.Empleado.Empleado.NombreCompleto,
                     TipoServicio = x.Tipo,
                     FechaInicio = x.FechaInicio,
-                    FechaFin = x.FechaFin
+                    FechaFin = x.FechaFin,
+                    PrecioUnitario = x.Precio
                 }).ToList();
 
                 await _emailService.SendSolicitudProveedorAsync(

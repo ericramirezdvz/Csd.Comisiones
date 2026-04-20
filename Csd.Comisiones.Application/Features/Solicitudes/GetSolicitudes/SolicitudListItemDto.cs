@@ -25,6 +25,9 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudes
 
         public string? Comentarios { get; set; }
 
+        public int? MotivoSolicitudId { get; set; }
+        public string? MotivoSolicitudNombre { get; set; }
+
         public DateTime FechaCreacion { get; set; }
 
         public int TotalEmpleados { get; set; }

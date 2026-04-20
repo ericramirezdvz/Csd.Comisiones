@@ -12,5 +12,6 @@ namespace Csd.Comisiones.Application.Features.Proveedores.SendProveedores
         public string TipoServicio { get; set; } = string.Empty;
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
+        public decimal PrecioUnitario { get; set; }
     }
 }

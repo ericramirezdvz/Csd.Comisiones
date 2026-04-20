@@ -42,11 +42,30 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
             string proveedorNombre,
             string folio,
             List<ProveedorDetalleDto> detalles,
-            Guid token);
+            Guid token,
+            bool esConciliacion = false);
 
         Task SendProveedorRechazoNotificacionAsync(
             string folio,
             string proveedorNombre,
             string motivo);
+
+        Task SendSolpedAsync(
+            string folio,
+            string obra,
+            string area,
+            string periodo,
+            string tablaAlimentacion,
+            string tablaHospedaje,
+            byte[]? excelAdjunto = null);
+
+        Task SendSolicitudProveedorModificadaAsync(
+            string correo,
+            string proveedorNombre,
+            string folio,
+            string empleadoNombre,
+            List<ProveedorDetalleDto> agregados,
+            List<ProveedorDetalleDto> eliminados,
+            Guid token);
     }
 }

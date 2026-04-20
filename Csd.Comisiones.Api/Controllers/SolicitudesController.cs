@@ -4,6 +4,7 @@ using Csd.Comisiones.Application.Features.Solicitudes.ApproveSolicitud;
 using Csd.Comisiones.Application.Features.Solicitudes.CancelSolicitud;
 using Csd.Comisiones.Application.Features.Solicitudes.CompleteSolicitud;
 using Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud;
+using Csd.Comisiones.Application.Features.Solicitudes.EnviarSolped;
 using Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById;
 using Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudes;
 using Csd.Comisiones.Application.Features.Solicitudes.RejectSolicitud;
@@ -75,6 +76,17 @@ namespace Csd.Comisiones.Api.Controllers
         public async Task<IActionResult> Complete(int id)
         {
             await _mediator.Send(new CompletarSolicitudCommand
+            {
+                SolicitudId = id
+            });
+
+            return NoContent();
+        }
+
+        [HttpPost("{id}/solped")]
+        public async Task<IActionResult> EnviarSolped(int id)
+        {
+            await _mediator.Send(new EnviarSolpedCommand
             {
                 SolicitudId = id
             });

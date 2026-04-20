@@ -104,7 +104,8 @@ namespace Csd.Comisiones.Domain.Entities
             int ciudadId,
             DateTime fechaInicio,
             DateTime fechaFin,
-            string? comentarios)
+            string? comentarios,
+            int? motivoSolicitudId = null)
         {
             var estatusPermitidos = new[]
             {
@@ -125,6 +126,7 @@ namespace Csd.Comisiones.Domain.Entities
             FechaInicio = fechaInicio;
             FechaFin = fechaFin;
             Comentarios = comentarios;
+            MotivoSolicitudId = motivoSolicitudId;
         }
 
         public void LimpiarEmpleados()

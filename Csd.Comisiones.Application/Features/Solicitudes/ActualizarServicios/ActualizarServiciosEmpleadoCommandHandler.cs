@@ -45,6 +45,22 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.ActualizarServicios
                 .FirstOrDefault(e => e.EmpleadoId == request.EmpleadoId)
                 ?? throw new Exception("Empleado no encontrado en la solicitud");
 
+            // ── 0. Capturar estado ANTERIOR de servicios por proveedor ──
+            var serviciosAnteriores = new List<(int proveedorId, string tipo, DateTime inicio, DateTime fin, decimal precio)>();
+
+            foreach (var h in empleado.Hoteles
+                .Where(h => h.ProveedorId.HasValue && h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada))
+            {
+                var tipoHab = h.TipoHabitacionId == 2 ? "Hospedaje - Doble" : "Hospedaje - Sencilla";
+                serviciosAnteriores.Add((h.ProveedorId!.Value, tipoHab, h.FechaInicio, h.FechaFin, h.PrecioUnitario));
+            }
+            foreach (var c in empleado.Comidas
+                .Where(c => c.ProveedorId.HasValue && c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada))
+            {
+                var tipoNombre = c.TipoComidaId switch { 1 => "Desayuno", 2 => "Comida", 3 => "Cena", _ => "Alimento" };
+                serviciosAnteriores.Add((c.ProveedorId!.Value, tipoNombre, c.FechaInicio, c.FechaFin, c.PrecioUnitario));
+            }
+
             // ── 1. Guardar info de servicios actuales para re-crear ──
             var lastHotel = empleado.Hoteles
                 .Where(h => h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada)
@@ -135,25 +151,31 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.ActualizarServicios
                 }
             }
 
-            // ── 4. Recopilar todos los proveedores con servicios activos ──
-            var proveedoresActivos = new HashSet<int>();
+            // ── 4. Capturar estado NUEVO de servicios por proveedor ──
+            var serviciosNuevos = new List<(int proveedorId, string tipo, DateTime inicio, DateTime fin, decimal precio)>();
+
             foreach (var h in empleado.Hoteles
-                .Where(h => h.ProveedorId.HasValue &&
-                            h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada))
+                .Where(h => h.ProveedorId.HasValue && h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada))
             {
-                proveedoresActivos.Add(h.ProveedorId!.Value);
+                var tipoHab = h.TipoHabitacionId == 2 ? "Hospedaje - Doble" : "Hospedaje - Sencilla";
+                serviciosNuevos.Add((h.ProveedorId!.Value, tipoHab, h.FechaInicio, h.FechaFin, h.PrecioUnitario));
             }
             foreach (var c in empleado.Comidas
-                .Where(c => c.ProveedorId.HasValue &&
-                            c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada))
+                .Where(c => c.ProveedorId.HasValue && c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada))
             {
-                proveedoresActivos.Add(c.ProveedorId!.Value);
+                var tipoNombre = c.TipoComidaId switch { 1 => "Desayuno", 2 => "Comida", 3 => "Cena", _ => "Alimento" };
+                serviciosNuevos.Add((c.ProveedorId!.Value, tipoNombre, c.FechaInicio, c.FechaFin, c.PrecioUnitario));
             }
 
-            // ── 5. Siempre notificar a todos los proveedores con servicios ──
+            // Todos los proveedores afectados (antes + ahora)
+            var todosProveedores = serviciosAnteriores.Select(s => s.proveedorId)
+                .Union(serviciosNuevos.Select(s => s.proveedorId))
+                .ToHashSet();
+
+            // ── 5. Notificar proveedores con diff de cambios ──
             var result = new ActualizarServiciosResult();
 
-            if (proveedoresActivos.Count > 0)
+            if (todosProveedores.Count > 0)
             {
                 // Invalidar todos los tokens vigentes de esta solicitud
                 var tokensVigentes = await _context.RespuestaProveedor
@@ -163,9 +185,9 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.ActualizarServicios
                 foreach (var token in tokensVigentes)
                     token.Invalidar();
 
-                foreach (var proveedorId in proveedoresActivos)
+                foreach (var proveedorId in todosProveedores)
                 {
-                    // Transicionar servicios a EnProceso
+                    // Transicionar servicios nuevos a EnProceso
                     foreach (var h in empleado.Hoteles
                         .Where(h => h.EstatusDetalleId == (int)EstatusDetalleEnum.Borrador &&
                                     h.ProveedorId == proveedorId))
@@ -192,46 +214,48 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.ActualizarServicios
 
                     if (string.IsNullOrEmpty(proveedor.Correo)) continue;
 
-                    var detalles = new List<ProveedorDetalleDto>();
+                    // Compute diff for this provider
+                    var antes = serviciosAnteriores
+                        .Where(s => s.proveedorId == proveedorId)
+                        .Select(s => (s.tipo, s.inicio, s.fin, s.precio))
+                        .ToList();
+                    var ahora = serviciosNuevos
+                        .Where(s => s.proveedorId == proveedorId)
+                        .Select(s => (s.tipo, s.inicio, s.fin, s.precio))
+                        .ToList();
 
-                    foreach (var h in empleado.Hoteles
-                        .Where(h => h.ProveedorId == proveedorId &&
-                                    h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada))
-                    {
-                        detalles.Add(new ProveedorDetalleDto
+                    // Items in ahora but not in antes = agregados
+                    var antesSet = new HashSet<(string, DateTime, DateTime, decimal)>(antes);
+                    var ahoraSet = new HashSet<(string, DateTime, DateTime, decimal)>(ahora);
+
+                    var agregados = ahora.Where(s => !antesSet.Contains(s))
+                        .Select(s => new ProveedorDetalleDto
                         {
                             NombreEmpleado = empleado.Empleado.NombreCompleto,
-                            TipoServicio = "Hotel",
-                            FechaInicio = h.FechaInicio,
-                            FechaFin = h.FechaFin
-                        });
-                    }
+                            TipoServicio = s.tipo,
+                            FechaInicio = s.inicio,
+                            FechaFin = s.fin,
+                            PrecioUnitario = s.precio
+                        }).ToList();
 
-                    foreach (var c in empleado.Comidas
-                        .Where(c => c.ProveedorId == proveedorId &&
-                                    c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada))
-                    {
-                        var tipoNombre = c.TipoComidaId switch
-                        {
-                            1 => "Desayuno",
-                            2 => "Comida",
-                            3 => "Cena",
-                            _ => "Alimento"
-                        };
-                        detalles.Add(new ProveedorDetalleDto
+                    var eliminados = antes.Where(s => !ahoraSet.Contains(s))
+                        .Select(s => new ProveedorDetalleDto
                         {
                             NombreEmpleado = empleado.Empleado.NombreCompleto,
-                            TipoServicio = tipoNombre,
-                            FechaInicio = c.FechaInicio,
-                            FechaFin = c.FechaFin
-                        });
-                    }
+                            TipoServicio = s.tipo,
+                            FechaInicio = s.inicio,
+                            FechaFin = s.fin,
+                            PrecioUnitario = s.precio
+                        }).ToList();
 
-                    await _emailService.SendSolicitudProveedorAsync(
+                    // Send modification email with diff
+                    await _emailService.SendSolicitudProveedorModificadaAsync(
                         proveedor.Correo,
                         proveedor.Nombre,
                         solicitud.Folio,
-                        detalles,
+                        empleado.Empleado.NombreCompleto,
+                        agregados,
+                        eliminados,
                         respuesta.Token);
                 }
 

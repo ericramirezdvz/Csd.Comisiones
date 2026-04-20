@@ -30,6 +30,8 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud
             request.FechaFin,
             request.Comentarios);
 
+            solicitud.MotivoSolicitudId = request.MotivoSolicitudId;
+
             foreach (var empleadoDto in request.Empleados)
             {
                 var solicitudEmpleado = empleadoDto.TipoAsignacion == 2 && empleadoDto.MontoPago.HasValue

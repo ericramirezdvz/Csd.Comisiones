@@ -47,6 +47,9 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudes
 
                     Comentarios = s.Comentarios,
 
+                    MotivoSolicitudId = s.MotivoSolicitudId,
+                    MotivoSolicitudNombre = s.MotivoSolicitud != null ? s.MotivoSolicitud.Nombre : null,
+
                     FechaCreacion = s.FechaCreacion,
 
                     TotalEmpleados = s.Empleados.Count(),

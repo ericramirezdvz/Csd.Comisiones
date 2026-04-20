@@ -25,6 +25,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CompleteSolicitud
                 .Include(x => x.Empleados).ThenInclude(e => e.Empleado)
                 .Include(x => x.Empleados).ThenInclude(e => e.Hoteles).ThenInclude(h => h.Proveedor)
                 .Include(x => x.Empleados).ThenInclude(e => e.Comidas).ThenInclude(c => c.Proveedor)
+                .Include(x => x.Empleados).ThenInclude(e => e.Comidas).ThenInclude(c => c.TipoComida)
                 .FirstOrDefaultAsync(x => x.SolicitudId == request.SolicitudId, cancellationToken);
 
             if (solicitud == null)
@@ -44,14 +45,18 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CompleteSolicitud
             var serviciosHotel = solicitud.Empleados
                 .SelectMany(e => e.Hoteles
                     .Where(h => h.ProveedorId != null && h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada)
-                    .Select(h => new { Proveedor = h.Proveedor, Empleado = e, Tipo = "Hotel",
-                        FechaInicio = h.FechaInicio, FechaFin = h.FechaFin }));
+                    .Select(h => new { Proveedor = h.Proveedor, Empleado = e,
+                        Tipo = h.TipoHabitacionId == 2 ? "Hospedaje - Doble" : "Hospedaje - Sencilla",
+                        FechaInicio = h.FechaInicio, FechaFin = h.FechaFin,
+                        Precio = h.PrecioUnitario }));
 
             var serviciosComida = solicitud.Empleados
                 .SelectMany(e => e.Comidas
                     .Where(c => c.ProveedorId != null && c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada)
-                    .Select(c => new { Proveedor = c.Proveedor, Empleado = e, Tipo = "Comida",
-                        FechaInicio = c.FechaInicio, FechaFin = c.FechaFin }));
+                    .Select(c => new { Proveedor = c.Proveedor, Empleado = e,
+                        Tipo = c.TipoComida?.Nombre ?? (c.TipoComidaId == 1 ? "Desayuno" : c.TipoComidaId == 2 ? "Comida" : "Cena"),
+                        FechaInicio = c.FechaInicio, FechaFin = c.FechaFin,
+                        Precio = c.PrecioUnitario }));
 
             var proveedores = serviciosHotel.Concat(serviciosComida)
                 .GroupBy(x => x.Proveedor.ProveedorId).ToList();
@@ -70,12 +75,13 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CompleteSolicitud
                     NombreEmpleado = x.Empleado.Empleado.NombreCompleto,
                     TipoServicio = x.Tipo,
                     FechaInicio = x.FechaInicio,
-                    FechaFin = x.FechaFin
+                    FechaFin = x.FechaFin,
+                    PrecioUnitario = x.Precio
                 }).ToList();
 
                 await _emailService.SendSolicitudProveedorAsync(
                     proveedor.Correo, proveedor.Nombre, solicitud.Folio,
-                    detalles, respuesta.Token);
+                    detalles, respuesta.Token, esConciliacion: true);
             }
 
             await ((DbContext)_context).SaveChangesAsync(cancellationToken);

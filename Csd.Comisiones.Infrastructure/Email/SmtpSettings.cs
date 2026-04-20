@@ -19,5 +19,7 @@ namespace Csd.Comisiones.Infrastructure.Email
         public string Password { get; set; }
 
         public string BaseUrl { get; set; }
+
+        public string[] SolpedRecipients { get; set; } = Array.Empty<string>();
     }
 }

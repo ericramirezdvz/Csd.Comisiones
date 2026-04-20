@@ -21,6 +21,8 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud
 
         public string? Comentarios { get; set; }
 
+        public int? MotivoSolicitudId { get; set; }
+
         public List<CreateSolicitudEmpleadoDto> Empleados { get; set; } = new();
     }
 }
