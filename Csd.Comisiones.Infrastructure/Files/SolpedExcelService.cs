@@ -214,8 +214,26 @@ namespace Csd.Comisiones.Infrastructure.Files
             }
 
             // ── Data rows ──
-            var empleados = solicitud.Empleados
+            // Collect all active hotel records across employees
+            var hotelRecords = solicitud.Empleados
                 .Where(e => e.TipoAsignacion != TipoAsignacionEnum.Pago)
+                .SelectMany(emp => emp.Hoteles
+                    .Where(h => h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada
+                             && h.ProveedorId.HasValue)
+                    .Select(h => new { Empleado = emp, Hotel = h }))
+                .ToList();
+
+            // Group by (Proveedor, TipoHabitacion, FechaInicio, FechaFin)
+            // so double rooms shared by 2 employees consolidate into one partida
+            var grupos = hotelRecords
+                .GroupBy(r => new
+                {
+                    r.Hotel.ProveedorId,
+                    r.Hotel.TipoHabitacionId,
+                    FechaInicio = r.Hotel.FechaInicio.Date,
+                    FechaFin = r.Hotel.FechaFin.Date
+                })
+                .OrderBy(g => g.Key.FechaInicio)
                 .ToList();
 
             int row = 2;
@@ -224,62 +242,64 @@ namespace Csd.Comisiones.Infrastructure.Files
             var folio = solicitud.Folio;
             var fechaSolicitud = solicitud.FechaCreacion;
 
-            foreach (var emp in empleados)
+            foreach (var grupo in grupos)
             {
-                var hotelesActivos = emp.Hoteles
-                    .Where(h => h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada
-                             && h.ProveedorId.HasValue)
-                    .OrderBy(h => h.FechaInicio)
-                    .ToList();
+                var numEmpleados = grupo.Count();
+                var esDoble = grupo.Key.TipoHabitacionId == 2;
+                var tipoHab = esDoble ? "HAB DOBLE" : "HAB SENCILLA";
 
-                foreach (var hotel in hotelesActivos)
-                {
-                    var proveedorNombre = hotel.Proveedor?.Nombre ?? "";
-                    var tipoHab = hotel.TipoHabitacionId == 2 ? "HAB DOBLE" : "HAB SENCILLA";
-                    var costoUnitario = hotel.PrecioUnitario;
+                // Double rooms: 2 employees per room
+                var habitaciones = esDoble
+                    ? (int)Math.Ceiling(numEmpleados / 2.0)
+                    : numEmpleados;
 
-                    // Calculate nights
-                    var noches = (hotel.FechaFin.Date - hotel.FechaInicio.Date).Days;
-                    if (noches < 1) noches = 1;
+                var costoUnitarioPorNoche = grupo.First().Hotel.PrecioUnitario;
+                var proveedorNombre = grupo.First().Hotel.Proveedor?.Nombre ?? "";
 
-                    var costoTotal = costoUnitario * noches;
-                    var ish = Math.Round(costoTotal * TasaISH, 2);
-                    var iva = Math.Round(costoTotal * TasaIVA, 2);
-                    var monto = costoTotal + ish + iva;
+                // Calculate nights
+                var noches = (grupo.Key.FechaFin - grupo.Key.FechaInicio).Days;
+                if (noches < 1) noches = 1;
 
-                    // ALCANCE: e.g., "01 HAB SENCILLA", "05 HAB DOBLES"
-                    var alcance = $"{noches:D2} {tipoHab}{(noches > 1 && tipoHab == "HAB DOBLE" ? "S" : "")}";
+                var totalHabNoches = habitaciones * noches;
+                var costoTotal = costoUnitarioPorNoche * totalHabNoches;
+                var ish = Math.Round(costoTotal * TasaISH, 2);
+                var iva = Math.Round(costoTotal * TasaIVA, 2);
+                var monto = costoTotal + ish + iva;
 
-                    // FECHA string
-                    var fechaStr = noches == 1
-                        ? hotel.FechaInicio.ToString("d/M/yyyy")
-                        : $"{hotel.FechaInicio:dd} AL {hotel.FechaFin.AddDays(-1):dd} DE {hotel.FechaFin.AddDays(-1):MMM}".ToUpper();
+                // ALCANCE: e.g., "01 HAB SENCILLA", "10 HAB DOBLES"
+                var alcance = $"{totalHabNoches:D2} {tipoHab}{(totalHabNoches > 1 && esDoble ? "S" : "")}";
 
-                    ws.Cell(row, 1).Value = fechaSolicitud;
-                    ws.Cell(row, 1).Style.DateFormat.Format = "dd/MM/yyyy";
-                    ws.Cell(row, 2).Value = obraNombre;
-                    ws.Cell(row, 3).Value = motivoNombre;
-                    ws.Cell(row, 4).Value = "Servicio";
-                    ws.Cell(row, 5).Value = "HOSPEDAJE";
-                    ws.Cell(row, 6).Value = 1.00;
-                    ws.Cell(row, 6).Style.NumberFormat.Format = "0.00";
-                    ws.Cell(row, 7).Value = "SER";
-                    ws.Cell(row, 8).Value = costoTotal;
-                    ws.Cell(row, 8).Style.NumberFormat.Format = "$#,##0.00";
-                    ws.Cell(row, 9).Value = ish;
-                    ws.Cell(row, 9).Style.NumberFormat.Format = "$#,##0.00";
-                    ws.Cell(row, 10).Value = iva;
-                    ws.Cell(row, 10).Style.NumberFormat.Format = "$#,##0.00";
-                    ws.Cell(row, 11).Value = monto;
-                    ws.Cell(row, 11).Style.NumberFormat.Format = "$#,##0.00";
-                    ws.Cell(row, 12).Value = "MXN";
-                    ws.Cell(row, 13).Value = proveedorNombre;
-                    ws.Cell(row, 14).Value = fechaStr;
-                    ws.Cell(row, 15).Value = alcance;
-                    ws.Cell(row, 16).Value = folio;
+                // FECHA string
+                var fechaIni = grupo.Key.FechaInicio;
+                var fechaFinReal = grupo.Key.FechaFin.AddDays(-1); // last night
+                var fechaStr = noches == 1
+                    ? fechaIni.ToString("d/M/yyyy")
+                    : $"{fechaIni:dd} AL {fechaFinReal:dd} DE {fechaFinReal:MMM}".ToUpper();
 
-                    row++;
-                }
+                ws.Cell(row, 1).Value = fechaSolicitud;
+                ws.Cell(row, 1).Style.DateFormat.Format = "dd/MM/yyyy";
+                ws.Cell(row, 2).Value = obraNombre;
+                ws.Cell(row, 3).Value = motivoNombre;
+                ws.Cell(row, 4).Value = "Servicio";
+                ws.Cell(row, 5).Value = "HOSPEDAJE";
+                ws.Cell(row, 6).Value = 1.00;
+                ws.Cell(row, 6).Style.NumberFormat.Format = "0.00";
+                ws.Cell(row, 7).Value = "SER";
+                ws.Cell(row, 8).Value = costoTotal;
+                ws.Cell(row, 8).Style.NumberFormat.Format = "$#,##0.00";
+                ws.Cell(row, 9).Value = ish;
+                ws.Cell(row, 9).Style.NumberFormat.Format = "$#,##0.00";
+                ws.Cell(row, 10).Value = iva;
+                ws.Cell(row, 10).Style.NumberFormat.Format = "$#,##0.00";
+                ws.Cell(row, 11).Value = monto;
+                ws.Cell(row, 11).Style.NumberFormat.Format = "$#,##0.00";
+                ws.Cell(row, 12).Value = "MXN";
+                ws.Cell(row, 13).Value = proveedorNombre;
+                ws.Cell(row, 14).Value = fechaStr;
+                ws.Cell(row, 15).Value = alcance;
+                ws.Cell(row, 16).Value = folio;
+
+                row++;
             }
 
             // Auto-fit columns
