@@ -29,5 +29,8 @@ namespace Csd.Comisiones.Application.Contracts.Persistence
         public DbSet<ProveedorServicio> ProveedorServicio { get; set; }
         public DbSet<UbicacionAlimento> UbicacionAlimento { get; set; }
         public DbSet<MotivoSolicitud> MotivoSolicitud { get; set; }
+        public DbSet<Usuario> Usuario { get; set; }
+        public DbSet<UsuarioRol> UsuariRol { get; set; }
+        public DbSet<Rol> Rol { get; set; }
     }
 }
