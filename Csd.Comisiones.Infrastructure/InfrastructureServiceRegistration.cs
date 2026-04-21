@@ -1,4 +1,5 @@
 ﻿using Csd.Comisiones.Application.Contracts.Infrastructure;
+using Csd.Comisiones.Infrastructure.Account;
 using Csd.Comisiones.Infrastructure.Email;
 using Csd.Comisiones.Infrastructure.Files;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +25,8 @@ namespace Csd.Comisiones.Infrastructure
             services.AddTransient<IEmailService, SmtpEmailService>();
             services.AddTransient<IFileParserService, FileParserService>();
             services.AddTransient<ISolpedExcelService, SolpedExcelService>();
+            services.AddTransient<IActiveDirectoryService, ActiveDirectoryService>();
+            services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
 
             return services;
         }
