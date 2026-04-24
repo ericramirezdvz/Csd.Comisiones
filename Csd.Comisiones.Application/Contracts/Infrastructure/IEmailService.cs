@@ -41,6 +41,7 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
             string correo,
             string proveedorNombre,
             string folio,
+            string subFolio,
             List<ProveedorDetalleDto> detalles,
             Guid token,
             bool esConciliacion = false);
@@ -59,13 +60,22 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
             string tablaHospedaje,
             byte[]? excelAdjunto = null);
 
+        /// <summary>
+        /// Envía el "Generador de Servicios y Subcontratos" (Excel) a un proveedor.
+        /// </summary>
+        Task SendGeneradorProveedorAsync(
+            string correoProveedor,
+            string proveedorNombre,
+            string folio,
+            byte[] excelAdjunto);
+
         Task SendSolicitudProveedorModificadaAsync(
             string correo,
             string proveedorNombre,
             string folio,
             string empleadoNombre,
-            List<ProveedorDetalleDto> agregados,
             List<ProveedorDetalleDto> eliminados,
+            List<ProveedorDetalleDto> vigentes,
             Guid token);
     }
 }

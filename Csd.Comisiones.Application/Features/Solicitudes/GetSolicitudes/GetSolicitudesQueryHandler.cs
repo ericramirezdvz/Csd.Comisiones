@@ -28,6 +28,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudes
         {
             var query = _context.Solicitud
                 .AsNoTracking()
+                .Where(s => request.SolicitanteId == null || s.SolicitanteId == request.SolicitanteId)
                 .Select(s => new SolicitudListItemDto
                 {
                     SolicitudId = s.SolicitudId,

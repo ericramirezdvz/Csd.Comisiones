@@ -47,22 +47,23 @@ namespace Csd.Comisiones.Application.Features.Proveedores.SendProveedores
                 .ToListAsync(cancellationToken);
 
             foreach (var tokenAnterior in tokensAnteriores)
-            {
                 tokenAnterior.Invalidar();
-            }
 
-            // Agrupar por proveedor (solo servicios no cancelados con proveedor asignado)
+            // Recopilar servicios activos con proveedor asignado
             var serviciosHotel = solicitud.Empleados
                 .SelectMany(e => e.Hoteles
                     .Where(h => h.ProveedorId != null && h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada)
                     .Select(h => new
                     {
+                        ProveedorId = h.Proveedor.ProveedorId,
                         Proveedor = h.Proveedor,
-                        Empleado = e,
-                        Tipo = h.TipoHabitacionId == 2 ? "Hospedaje - Doble" : "Hospedaje - Sencilla",
+                        EmpleadoNombre = e.Empleado.NombreCompleto,
+                        TipoServicio = h.TipoHabitacionId == 2 ? "Hospedaje - Doble" : "Hospedaje - Sencilla",
+                        TipoHabitacionId = (int?)h.TipoHabitacionId,
                         FechaInicio = h.FechaInicio,
                         FechaFin = h.FechaFin,
                         Precio = h.PrecioUnitario,
+                        EsHotel = true,
                         Hotel = (SolicitudHotel?)h,
                         Comida = (SolicitudComida?)null
                     }));
@@ -72,25 +73,32 @@ namespace Csd.Comisiones.Application.Features.Proveedores.SendProveedores
                     .Where(c => c.ProveedorId != null && c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada)
                     .Select(c => new
                     {
+                        ProveedorId = c.Proveedor.ProveedorId,
                         Proveedor = c.Proveedor,
-                        Empleado = e,
-                        Tipo = c.TipoComidaId == 1 ? "Desayuno" : c.TipoComidaId == 2 ? "Comida" : "Cena",
+                        EmpleadoNombre = e.Empleado.NombreCompleto,
+                        TipoServicio = c.TipoComidaId == 1 ? "Desayuno" : c.TipoComidaId == 2 ? "Comida" : "Cena",
+                        TipoHabitacionId = (int?)null,
                         FechaInicio = c.FechaInicio,
                         FechaFin = c.FechaFin,
                         Precio = c.PrecioUnitario,
+                        EsHotel = false,
                         Hotel = (SolicitudHotel?)null,
                         Comida = (SolicitudComida?)c
                     }));
 
             var proveedores = serviciosHotel
                 .Concat(serviciosComida)
-                .GroupBy(x => x.Proveedor.ProveedorId)
+                .GroupBy(x => x.ProveedorId)
                 .ToList();
 
-            // Generar token y enviar correo por proveedor
+            // Subfolio: A, B, C... por cada proveedor
+            var letraIdx = 0;
+
             foreach (var grupo in proveedores)
             {
                 var proveedor = grupo.First().Proveedor;
+                var subFolio = $"{solicitud.Folio}{(char)('A' + letraIdx)}";
+                letraIdx++;
 
                 // Transicionar servicios a EnProceso
                 foreach (var servicio in grupo)
@@ -106,19 +114,14 @@ namespace Csd.Comisiones.Application.Features.Proveedores.SendProveedores
                 if (string.IsNullOrEmpty(proveedor.Correo))
                     continue;
 
-                var detalles = grupo.Select(x => new ProveedorDetalleDto
-                {
-                    NombreEmpleado = x.Empleado.Empleado.NombreCompleto,
-                    TipoServicio = x.Tipo,
-                    FechaInicio = x.FechaInicio,
-                    FechaFin = x.FechaFin,
-                    PrecioUnitario = x.Precio
-                }).ToList();
+                // Construir detalles agrupados
+                var detalles = BuildDetallesAgrupados(grupo.ToList());
 
                 await _emailService.SendSolicitudProveedorAsync(
                     proveedor.Correo,
                     proveedor.Nombre,
                     solicitud.Folio,
+                    subFolio,
                     detalles,
                     respuesta.Token
                 );
@@ -127,6 +130,90 @@ namespace Csd.Comisiones.Application.Features.Proveedores.SendProveedores
             await ((DbContext)_context).SaveChangesAsync(cancellationToken);
 
             return Unit.Value;
+        }
+
+        /// <summary>
+        /// Agrupa servicios por tipo/fechas/precio. Para habitaciones dobles,
+        /// agrupa empleados y calcula la cantidad de habitaciones (ceil(n/2)).
+        /// Para sencillas y alimentos: 1 línea por empleado-servicio.
+        /// </summary>
+        private static List<ProveedorDetalleDto> BuildDetallesAgrupados<T>(List<T> servicios)
+            where T : class
+        {
+            // Usamos dynamic para acceder a las propiedades del tipo anónimo
+            var items = servicios.Cast<dynamic>().ToList();
+            var result = new List<ProveedorDetalleDto>();
+
+            // Separar hoteles dobles (se agrupan por habitación)
+            var hotelesDobles = items
+                .Where(x => (bool)x.EsHotel && x.TipoHabitacionId == 2)
+                .GroupBy(x => new { FI = (DateTime)x.FechaInicio, FF = (DateTime)x.FechaFin, P = (decimal)x.Precio })
+                .ToList();
+
+            foreach (var g in hotelesDobles)
+            {
+                var empleados = g.Select(x => (string)x.EmpleadoNombre).ToList();
+                var habitaciones = (int)Math.Ceiling(empleados.Count / 2.0);
+                var noches = Math.Max((g.Key.FF - g.Key.FI).Days, 1);
+
+                result.Add(new ProveedorDetalleDto
+                {
+                    TipoServicio = $"Hospedaje - Doble ({habitaciones} hab.)",
+                    Cantidad = habitaciones,
+                    Dias = noches,
+                    FechaInicio = g.Key.FI,
+                    FechaFin = g.Key.FF,
+                    PrecioUnitario = g.Key.P,
+                    Empleados = empleados
+                });
+            }
+
+            // Hoteles sencillos — 1 habitación por empleado
+            var hotelesSencillos = items
+                .Where(x => (bool)x.EsHotel && x.TipoHabitacionId != 2)
+                .GroupBy(x => new { FI = (DateTime)x.FechaInicio, FF = (DateTime)x.FechaFin, P = (decimal)x.Precio })
+                .ToList();
+
+            foreach (var g in hotelesSencillos)
+            {
+                var empleados = g.Select(x => (string)x.EmpleadoNombre).ToList();
+                var noches = Math.Max((g.Key.FF - g.Key.FI).Days, 1);
+                result.Add(new ProveedorDetalleDto
+                {
+                    TipoServicio = "Hospedaje - Sencilla",
+                    Cantidad = empleados.Count,
+                    Dias = noches,
+                    FechaInicio = g.Key.FI,
+                    FechaFin = g.Key.FF,
+                    PrecioUnitario = g.Key.P,
+                    Empleados = empleados
+                });
+            }
+
+            // Alimentos — agrupar por tipo + fechas + precio
+            var alimentos = items
+                .Where(x => !(bool)x.EsHotel)
+                .GroupBy(x => new { Tipo = (string)x.TipoServicio, FI = (DateTime)x.FechaInicio, FF = (DateTime)x.FechaFin, P = (decimal)x.Precio })
+                .ToList();
+
+            foreach (var g in alimentos)
+            {
+                var empleados = g.Select(x => (string)x.EmpleadoNombre).ToList();
+                // Días calendario inclusivos (considerar hora de inicio/fin)
+                var dias = Math.Max((g.Key.FF.Date - g.Key.FI.Date).Days + 1, 1);
+                result.Add(new ProveedorDetalleDto
+                {
+                    TipoServicio = g.Key.Tipo,
+                    Cantidad = empleados.Count,
+                    Dias = dias,
+                    FechaInicio = g.Key.FI,
+                    FechaFin = g.Key.FF,
+                    PrecioUnitario = g.Key.P,
+                    Empleados = empleados
+                });
+            }
+
+            return result;
         }
     }
 }

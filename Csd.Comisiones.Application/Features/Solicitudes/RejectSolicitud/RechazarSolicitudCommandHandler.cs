@@ -44,10 +44,11 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.RejectSolicitud
             if (solicitud.EstatusSolicitudId != (int)EstatusSolicitudEnum.EnAutorizaciónPorResponsableDeObra)
                 throw new Exception("Solo se pueden rechazar solicitudes en proceso de autorización");
 
-            var solicitante = await _context.Empleado
-                .FirstOrDefaultAsync(e => e.EmpleadoId == solicitud.SolicitanteId, cancellationToken);
+            var solicitante = await _context.Usuario
+                .FirstOrDefaultAsync(u => u.UsuarioId == solicitud.SolicitanteId, cancellationToken);
 
-            if (solicitante == null || string.IsNullOrEmpty(solicitante.Correo))
+            var correoSolicitante = solicitante?.Email ?? solicitante?.Username;
+            if (solicitante == null || string.IsNullOrEmpty(correoSolicitante))
                 throw new Exception("El solicitante no tiene correo configurado");
 
             solicitud.Rechazar(request.AutorizadorId, request.Comentarios);
@@ -152,7 +153,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.RejectSolicitud
                 .ToList();
 
             await _emailService.SendSolicitudRechazadaAsync(
-                solicitante.Correo,
+                correoSolicitante,
                 solicitud.Folio,
                 solicitud.ObraId.ToString(),
                 solicitud.FechaInicio,

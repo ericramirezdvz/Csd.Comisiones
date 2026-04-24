@@ -27,6 +27,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.EnviarSolped
             var solicitud = await _context.Solicitud
                 .Include(s => s.Obra)
                 .Include(s => s.Area)
+                .Include(s => s.Ciudad)
                 .Include(s => s.MotivoSolicitud)
                 .Include(s => s.Empleados)
                     .ThenInclude(e => e.Empleado)
@@ -72,6 +73,20 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.EnviarSolped
                 tablaAlimentacion,
                 tablaHospedaje,
                 excelBytes);
+
+            // ═══ GENERADOR POR PROVEEDOR ═══
+            var generadores = _excelService.GenerarExcelPorProveedor(solicitud);
+            foreach (var (_, (provNombre, provCorreo, excelProveedor)) in generadores)
+            {
+                if (string.IsNullOrWhiteSpace(provCorreo))
+                    continue;
+
+                await _emailService.SendGeneradorProveedorAsync(
+                    provCorreo,
+                    provNombre,
+                    solicitud.Folio,
+                    excelProveedor);
+            }
 
             return Unit.Value;
         }

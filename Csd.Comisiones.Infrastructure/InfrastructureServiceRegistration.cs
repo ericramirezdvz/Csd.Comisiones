@@ -22,6 +22,9 @@ namespace Csd.Comisiones.Infrastructure
             services.Configure<SmtpSettings>(
                 configuration.GetSection("SmtpSettings"));
 
+            services.Configure<JwtSettings>(
+                configuration.GetSection("JwtSettings"));
+
             services.AddTransient<IEmailService, SmtpEmailService>();
             services.AddTransient<IFileParserService, FileParserService>();
             services.AddTransient<ISolpedExcelService, SolpedExcelService>();

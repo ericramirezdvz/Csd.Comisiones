@@ -41,51 +41,142 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CompleteSolicitud
             foreach (var token in tokensAnteriores)
                 token.Invalidar();
 
-            // Agrupar servicios activos por proveedor para conciliación
+            // Recopilar servicios activos
             var serviciosHotel = solicitud.Empleados
                 .SelectMany(e => e.Hoteles
                     .Where(h => h.ProveedorId != null && h.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada)
-                    .Select(h => new { Proveedor = h.Proveedor, Empleado = e,
-                        Tipo = h.TipoHabitacionId == 2 ? "Hospedaje - Doble" : "Hospedaje - Sencilla",
-                        FechaInicio = h.FechaInicio, FechaFin = h.FechaFin,
-                        Precio = h.PrecioUnitario }));
+                    .Select(h => new
+                    {
+                        ProveedorId = h.Proveedor.ProveedorId,
+                        Proveedor = h.Proveedor,
+                        EmpleadoNombre = e.Empleado.NombreCompleto,
+                        TipoServicio = h.TipoHabitacionId == 2 ? "Hospedaje - Doble" : "Hospedaje - Sencilla",
+                        TipoHabitacionId = (int?)h.TipoHabitacionId,
+                        FechaInicio = h.FechaInicio,
+                        FechaFin = h.FechaFin,
+                        Precio = h.PrecioUnitario,
+                        EsHotel = true
+                    }));
 
             var serviciosComida = solicitud.Empleados
                 .SelectMany(e => e.Comidas
                     .Where(c => c.ProveedorId != null && c.EstatusDetalleId != (int)EstatusDetalleEnum.Cancelada)
-                    .Select(c => new { Proveedor = c.Proveedor, Empleado = e,
-                        Tipo = c.TipoComida?.Nombre ?? (c.TipoComidaId == 1 ? "Desayuno" : c.TipoComidaId == 2 ? "Comida" : "Cena"),
-                        FechaInicio = c.FechaInicio, FechaFin = c.FechaFin,
-                        Precio = c.PrecioUnitario }));
+                    .Select(c => new
+                    {
+                        ProveedorId = c.Proveedor.ProveedorId,
+                        Proveedor = c.Proveedor,
+                        EmpleadoNombre = e.Empleado.NombreCompleto,
+                        TipoServicio = c.TipoComida?.Nombre ?? (c.TipoComidaId == 1 ? "Desayuno" : c.TipoComidaId == 2 ? "Comida" : "Cena"),
+                        TipoHabitacionId = (int?)null,
+                        FechaInicio = c.FechaInicio,
+                        FechaFin = c.FechaFin,
+                        Precio = c.PrecioUnitario,
+                        EsHotel = false
+                    }));
 
             var proveedores = serviciosHotel.Concat(serviciosComida)
-                .GroupBy(x => x.Proveedor.ProveedorId).ToList();
+                .GroupBy(x => x.ProveedorId).ToList();
+
+            var letraIdx = 0;
 
             foreach (var grupo in proveedores)
             {
                 var proveedor = grupo.First().Proveedor;
+                var subFolio = $"{solicitud.Folio}{(char)('A' + letraIdx)}";
+                letraIdx++;
 
                 var respuesta = new RespuestaProveedor(request.SolicitudId, proveedor.ProveedorId);
                 _context.RespuestaProveedor.Add(respuesta);
 
                 if (string.IsNullOrEmpty(proveedor.Correo)) continue;
 
-                var detalles = grupo.Select(x => new ProveedorDetalleDto
-                {
-                    NombreEmpleado = x.Empleado.Empleado.NombreCompleto,
-                    TipoServicio = x.Tipo,
-                    FechaInicio = x.FechaInicio,
-                    FechaFin = x.FechaFin,
-                    PrecioUnitario = x.Precio
-                }).ToList();
+                var detalles = BuildDetallesAgrupados(grupo.ToList());
 
                 await _emailService.SendSolicitudProveedorAsync(
                     proveedor.Correo, proveedor.Nombre, solicitud.Folio,
-                    detalles, respuesta.Token, esConciliacion: true);
+                    subFolio, detalles, respuesta.Token, esConciliacion: true);
             }
 
             await ((DbContext)_context).SaveChangesAsync(cancellationToken);
             return Unit.Value;
+        }
+
+        /// <summary>
+        /// Agrupa servicios por tipo/fechas/precio. Habitaciones dobles se agrupan
+        /// calculando ceil(empleados/2). Alimentos y sencillas se agrupan por cantidad.
+        /// </summary>
+        private static List<ProveedorDetalleDto> BuildDetallesAgrupados<T>(List<T> servicios)
+            where T : class
+        {
+            var items = servicios.Cast<dynamic>().ToList();
+            var result = new List<ProveedorDetalleDto>();
+
+            // Hoteles dobles → agrupar por fechas/precio, calcular habitaciones
+            var hotelesDobles = items
+                .Where(x => (bool)x.EsHotel && x.TipoHabitacionId == 2)
+                .GroupBy(x => new { FI = (DateTime)x.FechaInicio, FF = (DateTime)x.FechaFin, P = (decimal)x.Precio })
+                .ToList();
+
+            foreach (var g in hotelesDobles)
+            {
+                var empleados = g.Select(x => (string)x.EmpleadoNombre).ToList();
+                var habitaciones = (int)Math.Ceiling(empleados.Count / 2.0);
+                var noches = Math.Max((g.Key.FF - g.Key.FI).Days, 1);
+                result.Add(new ProveedorDetalleDto
+                {
+                    TipoServicio = $"Hospedaje - Doble ({habitaciones} hab.)",
+                    Cantidad = habitaciones,
+                    Dias = noches,
+                    FechaInicio = g.Key.FI, FechaFin = g.Key.FF,
+                    PrecioUnitario = g.Key.P,
+                    Empleados = empleados
+                });
+            }
+
+            // Hoteles sencillos → 1 hab. por empleado
+            var hotelesSencillos = items
+                .Where(x => (bool)x.EsHotel && x.TipoHabitacionId != 2)
+                .GroupBy(x => new { FI = (DateTime)x.FechaInicio, FF = (DateTime)x.FechaFin, P = (decimal)x.Precio })
+                .ToList();
+
+            foreach (var g in hotelesSencillos)
+            {
+                var empleados = g.Select(x => (string)x.EmpleadoNombre).ToList();
+                var noches = Math.Max((g.Key.FF - g.Key.FI).Days, 1);
+                result.Add(new ProveedorDetalleDto
+                {
+                    TipoServicio = "Hospedaje - Sencilla",
+                    Cantidad = empleados.Count,
+                    Dias = noches,
+                    FechaInicio = g.Key.FI, FechaFin = g.Key.FF,
+                    PrecioUnitario = g.Key.P,
+                    Empleados = empleados
+                });
+            }
+
+            // Alimentos → agrupar por tipo + fechas + precio
+            var alimentos = items
+                .Where(x => !(bool)x.EsHotel)
+                .GroupBy(x => new { Tipo = (string)x.TipoServicio, FI = (DateTime)x.FechaInicio, FF = (DateTime)x.FechaFin, P = (decimal)x.Precio })
+                .ToList();
+
+            foreach (var g in alimentos)
+            {
+                var empleados = g.Select(x => (string)x.EmpleadoNombre).ToList();
+                // Días calendario inclusivos (considerar hora de inicio/fin)
+                var dias = Math.Max((g.Key.FF.Date - g.Key.FI.Date).Days + 1, 1);
+                result.Add(new ProveedorDetalleDto
+                {
+                    TipoServicio = g.Key.Tipo,
+                    Cantidad = empleados.Count,
+                    Dias = dias,
+                    FechaInicio = g.Key.FI, FechaFin = g.Key.FF,
+                    PrecioUnitario = g.Key.P,
+                    Empleados = empleados
+                });
+            }
+
+            return result;
         }
     }
 }

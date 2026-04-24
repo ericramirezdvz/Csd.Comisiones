@@ -20,10 +20,11 @@ namespace Csd.Comisiones.Infrastructure.Account
             _settings = settings.Value;
         }
 
-        public string GenerateToken(string username, List<string> roles)
+        public string GenerateToken(int usuarioId, string username, List<string> roles)
         {
             var claims = new List<Claim>
         {
+            new Claim(ClaimTypes.NameIdentifier, usuarioId.ToString()),
             new Claim(ClaimTypes.Name, username)
         };
 

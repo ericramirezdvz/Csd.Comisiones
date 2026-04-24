@@ -204,6 +204,7 @@ namespace Csd.Comisiones.Infrastructure.Email
     string correo,
     string proveedorNombre,
     string folio,
+    string subFolio,
     List<ProveedorDetalleDto> detalles,
     Guid token,
     bool esConciliacion = false)
@@ -217,19 +218,42 @@ namespace Csd.Comisiones.Infrastructure.Email
             var urlAceptar = $"{baseUrl}/api/proveedores/respuesta/{token}/aceptar";
             var urlRechazar = $"{baseUrl}/api/proveedores/respuesta/{token}/rechazar-form";
 
-            var rows = string.Join("", detalles.Select(d => $@"
+            // Filas de servicios agrupados con cantidad y subtotal
+            var rows = string.Join("", detalles.Select(d =>
+            {
+                var empleadosList = d.Empleados.Count > 0
+                    ? $"<div style='font-size:11px; color:#666; margin-top:2px;'>{string.Join(", ", d.Empleados)}</div>"
+                    : "";
+
+                // Para hospedaje/alimentos, mostrar días del periodo
+                var diasInfo = d.Dias > 1
+                    ? $"<div style='font-size:11px; color:#666;'>{d.Dias} días</div>"
+                    : "";
+
+                return $@"
         <tr style='border-bottom: 1px solid #eee;'>
-            <td style='padding: 8px;'>{d.NombreEmpleado}</td>
-            <td style='padding: 8px;'>{d.TipoServicio}</td>
+            <td style='padding: 8px;'>{d.TipoServicio}{diasInfo}{empleadosList}</td>
+            <td style='padding: 8px; text-align: center;'>{d.Cantidad}</td>
             <td style='padding: 8px; text-align: center;'>{d.FechaInicio:dd/MM/yyyy}</td>
             <td style='padding: 8px; text-align: center;'>{d.FechaFin:dd/MM/yyyy}</td>
             <td style='padding: 8px; text-align: right;'>{d.PrecioUnitario:C2}</td>
-        </tr>"));
+            <td style='padding: 8px; text-align: right; font-weight: 600;'>{d.Subtotal:C2}</td>
+        </tr>";
+            }));
+
+            // Fila de total
+            var total = detalles.Sum(d => d.Subtotal);
+            rows += $@"
+        <tr style='background: #f0f0f0; font-weight: bold;'>
+            <td colspan='5' style='padding: 10px 8px; text-align: right;'>TOTAL</td>
+            <td style='padding: 10px 8px; text-align: right; font-size: 15px;'>{total:C2}</td>
+        </tr>";
 
             var body = EmailTemplateHelper.Replace(template, new Dictionary<string, string>
     {
         { "Proveedor", proveedorNombre },
         { "Folio", folio },
+        { "SubFolio", subFolio },
         { "Rows", rows },
         { "UrlAceptar", urlAceptar },
         { "UrlRechazar", urlRechazar }
@@ -240,8 +264,8 @@ namespace Csd.Comisiones.Infrastructure.Email
             email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
             email.To.Add(MailboxAddress.Parse(correo));
             email.Subject = esConciliacion
-                ? $"Conciliación de servicios - {folio}"
-                : $"Solicitud de servicios - {folio}";
+                ? $"Conciliación de servicios - {subFolio}"
+                : $"Solicitud de servicios - {subFolio}";
 
             var builder = new BodyBuilder { HtmlBody = body };
             email.Body = builder.ToMessageBody();
@@ -344,13 +368,49 @@ namespace Csd.Comisiones.Infrastructure.Email
             await smtp.DisconnectAsync(true);
         }
 
+        public async Task SendGeneradorProveedorAsync(
+            string correoProveedor,
+            string proveedorNombre,
+            string folio,
+            byte[] excelAdjunto)
+        {
+            var email = new MimeMessage();
+            email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
+            email.To.Add(MailboxAddress.Parse(correoProveedor));
+            email.Subject = $"Generador de Servicios - {folio} - {proveedorNombre}";
+
+            var builder = new BodyBuilder
+            {
+                HtmlBody = $@"
+                    <p>Estimado(a) <strong>{proveedorNombre}</strong>,</p>
+                    <p>Se adjunta el generador de servicios y subcontratos correspondiente al folio <strong>{folio}</strong>.</p>
+                    <p>Favor de revisar la información y confirmar la recepción.</p>
+                    <br/>
+                    <p style='color:#888; font-size:12px;'>Este es un correo generado automáticamente por el sistema de comisiones DIAVAZ.</p>"
+            };
+
+            builder.Attachments.Add(
+                $"Generador_{folio}_{proveedorNombre.Replace(" ", "_")}.xlsx",
+                excelAdjunto,
+                new MimeKit.ContentType("application", "vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+
+            email.Body = builder.ToMessageBody();
+
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_settings.Server, _settings.Port,
+                _settings.UseSSL ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto);
+            await smtp.AuthenticateAsync(_settings.Username, _settings.Password);
+            await smtp.SendAsync(email);
+            await smtp.DisconnectAsync(true);
+        }
+
         public async Task SendSolicitudProveedorModificadaAsync(
             string correo,
             string proveedorNombre,
             string folio,
             string empleadoNombre,
-            List<ProveedorDetalleDto> agregados,
             List<ProveedorDetalleDto> eliminados,
+            List<ProveedorDetalleDto> vigentes,
             Guid token)
         {
             var template = EmailTemplateHelper.LoadTemplate("SolicitudProveedorModificacion.html");
@@ -359,60 +419,88 @@ namespace Csd.Comisiones.Infrastructure.Email
             var urlAceptar = $"{baseUrl}/api/proveedores/respuesta/{token}/aceptar";
             var urlRechazar = $"{baseUrl}/api/proveedores/respuesta/{token}/rechazar-form";
 
-            // Build "Agregados" section
-            var seccionAgregados = "";
-            if (agregados.Count > 0)
+            // Build "Cancelados" section — servicios que se quitaron
+            var seccionCancelados = "";
+            if (eliminados.Count > 0)
             {
-                var rows = string.Join("", agregados.Select(d => $@"
+                var rows = string.Join("", eliminados.Select(d => $@"
                     <tr style='border-bottom: 1px solid #eee;'>
-                        <td style='padding: 8px;'>{d.TipoServicio}</td>
-                        <td style='padding: 8px; text-align: center;'>{d.FechaInicio:dd/MM/yyyy}</td>
-                        <td style='padding: 8px; text-align: center;'>{d.FechaFin:dd/MM/yyyy}</td>
-                        <td style='padding: 8px; text-align: right;'>{d.PrecioUnitario:C2}</td>
+                        <td style='padding: 8px; text-decoration: line-through; color: #999;'>{d.TipoServicio}</td>
+                        <td style='padding: 8px; text-align: center;'>{d.Dias}</td>
+                        <td style='padding: 8px; text-align: center; text-decoration: line-through; color: #999;'>{d.FechaInicio:dd/MM/yyyy}</td>
+                        <td style='padding: 8px; text-align: center; text-decoration: line-through; color: #999;'>{d.FechaFin:dd/MM/yyyy}</td>
+                        <td style='padding: 8px; text-align: right; text-decoration: line-through; color: #999;'>{d.PrecioUnitario:C2}</td>
+                        <td style='padding: 8px; text-align: right; text-decoration: line-through; color: #999;'>{d.Subtotal:C2}</td>
                     </tr>"));
 
-                seccionAgregados = $@"
-                <h3 style='color: #2e7d32; margin-top: 20px;'>&#10133; Servicios agregados</h3>
+                seccionCancelados = $@"
+                <h3 style='color: #c62828; margin-top: 20px;'>&#10060; Servicios cancelados</h3>
                 <table width='100%' cellpadding='8' cellspacing='0'
                     style='border-collapse: collapse; margin: 10px 0; font-size: 14px;'>
                     <thead>
-                        <tr style='background: #e8f5e9;'>
-                            <th style='text-align: left; border-bottom: 2px solid #a5d6a7; padding: 10px 8px;'>Servicio</th>
-                            <th style='text-align: center; border-bottom: 2px solid #a5d6a7; padding: 10px 8px;'>Inicio</th>
-                            <th style='text-align: center; border-bottom: 2px solid #a5d6a7; padding: 10px 8px;'>Fin</th>
-                            <th style='text-align: right; border-bottom: 2px solid #a5d6a7; padding: 10px 8px;'>Precio</th>
+                        <tr style='background: #ffebee;'>
+                            <th style='text-align: left; border-bottom: 2px solid #ef9a9a; padding: 10px 8px;'>Servicio</th>
+                            <th style='text-align: center; border-bottom: 2px solid #ef9a9a; padding: 10px 8px;'>Días</th>
+                            <th style='text-align: center; border-bottom: 2px solid #ef9a9a; padding: 10px 8px;'>Inicio</th>
+                            <th style='text-align: center; border-bottom: 2px solid #ef9a9a; padding: 10px 8px;'>Fin</th>
+                            <th style='text-align: right; border-bottom: 2px solid #ef9a9a; padding: 10px 8px;'>P. Unit.</th>
+                            <th style='text-align: right; border-bottom: 2px solid #ef9a9a; padding: 10px 8px;'>Subtotal</th>
                         </tr>
                     </thead>
                     <tbody>{rows}</tbody>
                 </table>";
             }
 
-            // Build "Eliminados" section
-            var seccionEliminados = "";
-            if (eliminados.Count > 0)
+            // Build "Vigentes" section — servicios que permanecen activos
+            var seccionVigentes = "";
+            if (vigentes.Count > 0)
             {
-                var rows = string.Join("", eliminados.Select(d => $@"
+                var rows = string.Join("", vigentes.Select(d =>
+                {
+                    var diasInfo = d.Dias > 1
+                        ? $"<div style='font-size:11px; color:#666;'>{d.Dias} días</div>"
+                        : "";
+                    return $@"
                     <tr style='border-bottom: 1px solid #eee;'>
-                        <td style='padding: 8px; text-decoration: line-through; color: #999;'>{d.TipoServicio}</td>
-                        <td style='padding: 8px; text-align: center; text-decoration: line-through; color: #999;'>{d.FechaInicio:dd/MM/yyyy}</td>
-                        <td style='padding: 8px; text-align: center; text-decoration: line-through; color: #999;'>{d.FechaFin:dd/MM/yyyy}</td>
-                        <td style='padding: 8px; text-align: right; text-decoration: line-through; color: #999;'>{d.PrecioUnitario:C2}</td>
-                    </tr>"));
+                        <td style='padding: 8px;'>{d.TipoServicio}{diasInfo}</td>
+                        <td style='padding: 8px; text-align: center;'>{d.Cantidad}</td>
+                        <td style='padding: 8px; text-align: center;'>{d.FechaInicio:dd/MM/yyyy}</td>
+                        <td style='padding: 8px; text-align: center;'>{d.FechaFin:dd/MM/yyyy}</td>
+                        <td style='padding: 8px; text-align: right;'>{d.PrecioUnitario:C2}</td>
+                        <td style='padding: 8px; text-align: right; font-weight: 600;'>{d.Subtotal:C2}</td>
+                    </tr>";
+                }));
 
-                seccionEliminados = $@"
-                <h3 style='color: #c62828; margin-top: 20px;'>&#10134; Servicios eliminados</h3>
+                var total = vigentes.Sum(d => d.Subtotal);
+                rows += $@"
+                    <tr style='background: #f0f0f0; font-weight: bold;'>
+                        <td colspan='5' style='padding: 10px 8px; text-align: right;'>TOTAL VIGENTE</td>
+                        <td style='padding: 10px 8px; text-align: right; font-size: 15px;'>{total:C2}</td>
+                    </tr>";
+
+                seccionVigentes = $@"
+                <h3 style='color: #1565c0; margin-top: 20px;'>&#9989; Servicios vigentes</h3>
                 <table width='100%' cellpadding='8' cellspacing='0'
                     style='border-collapse: collapse; margin: 10px 0; font-size: 14px;'>
                     <thead>
-                        <tr style='background: #ffebee;'>
-                            <th style='text-align: left; border-bottom: 2px solid #ef9a9a; padding: 10px 8px;'>Servicio</th>
-                            <th style='text-align: center; border-bottom: 2px solid #ef9a9a; padding: 10px 8px;'>Inicio</th>
-                            <th style='text-align: center; border-bottom: 2px solid #ef9a9a; padding: 10px 8px;'>Fin</th>
-                            <th style='text-align: right; border-bottom: 2px solid #ef9a9a; padding: 10px 8px;'>Precio</th>
+                        <tr style='background: #e3f2fd;'>
+                            <th style='text-align: left; border-bottom: 2px solid #90caf9; padding: 10px 8px;'>Servicio</th>
+                            <th style='text-align: center; border-bottom: 2px solid #90caf9; padding: 10px 8px;'>Cant.</th>
+                            <th style='text-align: center; border-bottom: 2px solid #90caf9; padding: 10px 8px;'>Inicio</th>
+                            <th style='text-align: center; border-bottom: 2px solid #90caf9; padding: 10px 8px;'>Fin</th>
+                            <th style='text-align: right; border-bottom: 2px solid #90caf9; padding: 10px 8px;'>P. Unit.</th>
+                            <th style='text-align: right; border-bottom: 2px solid #90caf9; padding: 10px 8px;'>Subtotal</th>
                         </tr>
                     </thead>
                     <tbody>{rows}</tbody>
                 </table>";
+            }
+            else
+            {
+                seccionVigentes = @"
+                <div style='background: #fff3e0; border-left: 4px solid #e65100; padding: 12px 16px; margin-top: 20px; font-size: 14px;'>
+                    <strong>&#9888; Todos los servicios han sido cancelados</strong> para este empleado.
+                </div>";
             }
 
             var body = EmailTemplateHelper.Replace(template, new Dictionary<string, string>
@@ -420,8 +508,8 @@ namespace Csd.Comisiones.Infrastructure.Email
                 { "Proveedor", proveedorNombre },
                 { "Folio", folio },
                 { "Empleado", empleadoNombre },
-                { "SeccionAgregados", seccionAgregados },
-                { "SeccionEliminados", seccionEliminados },
+                { "SeccionCancelados", seccionCancelados },
+                { "SeccionVigentes", seccionVigentes },
                 { "UrlAceptar", urlAceptar },
                 { "UrlRechazar", urlRechazar }
             });

@@ -224,38 +224,49 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.ActualizarServicios
                         .Select(s => (s.tipo, s.inicio, s.fin, s.precio))
                         .ToList();
 
-                    // Items in ahora but not in antes = agregados
-                    var antesSet = new HashSet<(string, DateTime, DateTime, decimal)>(antes);
                     var ahoraSet = new HashSet<(string, DateTime, DateTime, decimal)>(ahora);
 
-                    var agregados = ahora.Where(s => !antesSet.Contains(s))
-                        .Select(s => new ProveedorDetalleDto
-                        {
-                            NombreEmpleado = empleado.Empleado.NombreCompleto,
-                            TipoServicio = s.tipo,
-                            FechaInicio = s.inicio,
-                            FechaFin = s.fin,
-                            PrecioUnitario = s.precio
-                        }).ToList();
-
+                    // Servicios que estaban antes pero ya no → cancelados
                     var eliminados = antes.Where(s => !ahoraSet.Contains(s))
                         .Select(s => new ProveedorDetalleDto
                         {
-                            NombreEmpleado = empleado.Empleado.NombreCompleto,
                             TipoServicio = s.tipo,
+                            Cantidad = 1,
+                            Dias = s.tipo.StartsWith("Hospedaje")
+                                ? Math.Max((s.fin - s.inicio).Days, 1)
+                                : Math.Max((s.fin.Date - s.inicio.Date).Days + 1, 1),
                             FechaInicio = s.inicio,
                             FechaFin = s.fin,
-                            PrecioUnitario = s.precio
+                            PrecioUnitario = s.precio,
+                            Empleados = new List<string> { empleado.Empleado.NombreCompleto }
                         }).ToList();
 
-                    // Send modification email with diff
+                    // Servicios que quedan vigentes actualmente
+                    var vigentes = ahora
+                        .Select(s => new ProveedorDetalleDto
+                        {
+                            TipoServicio = s.tipo,
+                            Cantidad = 1,
+                            Dias = s.tipo.StartsWith("Hospedaje")
+                                ? Math.Max((s.fin - s.inicio).Days, 1)
+                                : Math.Max((s.fin.Date - s.inicio.Date).Days + 1, 1),
+                            FechaInicio = s.inicio,
+                            FechaFin = s.fin,
+                            PrecioUnitario = s.precio,
+                            Empleados = new List<string> { empleado.Empleado.NombreCompleto }
+                        }).ToList();
+
+                    // Solo enviar email si hubo cambios reales
+                    if (eliminados.Count == 0 && antes.Count == ahora.Count) continue;
+
+                    // Send modification email with removed + remaining
                     await _emailService.SendSolicitudProveedorModificadaAsync(
                         proveedor.Correo,
                         proveedor.Nombre,
                         solicitud.Folio,
                         empleado.Empleado.NombreCompleto,
-                        agregados,
                         eliminados,
+                        vigentes,
                         respuesta.Token);
                 }
 

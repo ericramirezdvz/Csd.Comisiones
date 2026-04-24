@@ -12,5 +12,11 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudes
     {
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
+
+        /// <summary>
+        /// Si tiene valor, filtra solo las solicitudes creadas por este UsuarioId.
+        /// null = sin filtro (admin ve todo).
+        /// </summary>
+        public int? SolicitanteId { get; set; }
     }
 }

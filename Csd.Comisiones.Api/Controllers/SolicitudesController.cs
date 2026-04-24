@@ -14,6 +14,7 @@ using Csd.Comisiones.Application.Features.Solicitudes.UpdateSolicitud;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Csd.Comisiones.Api.Controllers
@@ -121,6 +122,15 @@ namespace Csd.Comisiones.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery]GetSolicitudesQuery query)
         {
+            // Si el usuario no es admin, filtrar por su UsuarioId
+            var isAdmin = User.IsInRole("CAPITAL_HUMANO");
+            if (!isAdmin)
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (int.TryParse(userIdClaim, out var userId))
+                    query.SolicitanteId = userId;
+            }
+
             var result = await _mediator.Send(query);
 
             return Ok(result);
