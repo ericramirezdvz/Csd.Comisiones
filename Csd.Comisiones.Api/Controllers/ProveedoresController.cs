@@ -1,4 +1,5 @@
 ﻿using Csd.Comisiones.Application.Features.Proveedores.GetProveedores;
+using Csd.Comisiones.Application.Features.Proveedores.GetRespuestas;
 using Csd.Comisiones.Application.Features.Proveedores.SendProveedores;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -30,6 +31,13 @@ namespace Csd.Comisiones.Api.Controllers
         {
             await _mediator.Send(new EnviarProveedoresCommand(solicitudId));
             return Ok();
+        }
+
+        [HttpGet("{solicitudId}/respuestas")]
+        public async Task<IActionResult> GetRespuestas(int solicitudId)
+        {
+            var result = await _mediator.Send(new GetRespuestasProveedorQuery(solicitudId));
+            return Ok(result);
         }
     }
 }

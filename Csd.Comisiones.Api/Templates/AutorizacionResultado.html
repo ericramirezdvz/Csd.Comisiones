@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f8;
+      font-family: Arial, sans-serif;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f4f6f8; padding: 20px"
+    >
+      <tr>
+        <td align="center">
+          <!-- Contenedor -->
+          <table
+            width="600"
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              background: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            "
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                style="background:{{HeaderColor}}; color:white; padding:20px; text-align:center;"
+              >
+                <h2 style="margin: 0">{{Titulo}}</h2>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td style="padding: 30px; color: #333; text-align: center">
+                <div style="font-size: 48px; margin-bottom: 15px">
+                  {{Icono}}
+                </div>
+
+                <p style="font-size: 16px">{{Mensaje}}</p>
+
+                <table
+                  width="100%"
+                  cellpadding="8"
+                  cellspacing="0"
+                  style="
+                    margin: 20px 0;
+                    border-collapse: collapse;
+                    text-align: left;
+                  "
+                >
+                  <tr style="border-bottom: 1px solid #eee">
+                    <td style="font-weight: bold; width: 120px; color: #555">
+                      Folio:
+                    </td>
+                    <td>{{Folio}}</td>
+                  </tr>
+                </table>
+
+                <p style="color: #888; font-size: 13px; margin-top: 25px">
+                  Puedes cerrar esta ventana.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -1,8 +1,10 @@
 ﻿using Csd.Comisiones.Api.Dtos;
+using Csd.Comisiones.Application.Features.Solicitudes.ActualizarServicios;
 using Csd.Comisiones.Application.Features.Solicitudes.ApproveSolicitud;
 using Csd.Comisiones.Application.Features.Solicitudes.CancelSolicitud;
 using Csd.Comisiones.Application.Features.Solicitudes.CompleteSolicitud;
 using Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud;
+using Csd.Comisiones.Application.Features.Solicitudes.EnviarSolped;
 using Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById;
 using Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudes;
 using Csd.Comisiones.Application.Features.Solicitudes.RejectSolicitud;
@@ -12,6 +14,7 @@ using Csd.Comisiones.Application.Features.Solicitudes.UpdateSolicitud;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Csd.Comisiones.Api.Controllers
@@ -81,6 +84,17 @@ namespace Csd.Comisiones.Api.Controllers
             return NoContent();
         }
 
+        [HttpPost("{id}/solped")]
+        public async Task<IActionResult> EnviarSolped(int id)
+        {
+            await _mediator.Send(new EnviarSolpedCommand
+            {
+                SolicitudId = id
+            });
+
+            return NoContent();
+        }
+
         [HttpPost("{id}/reject")]
         public async Task<IActionResult> Reject(int id, [FromBody] RechazarSolicitudCommand request)
         {
@@ -108,6 +122,15 @@ namespace Csd.Comisiones.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery]GetSolicitudesQuery query)
         {
+            // Si el usuario no es admin, filtrar por su UsuarioId
+            var isAdmin = User.IsInRole("CAPITAL_HUMANO");
+            if (!isAdmin)
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (int.TryParse(userIdClaim, out var userId))
+                    query.SolicitanteId = userId;
+            }
+
             var result = await _mediator.Send(query);
 
             return Ok(result);
@@ -116,10 +139,8 @@ namespace Csd.Comisiones.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateSolicitudCommand request)
         {
-            await _mediator.Send(new UpdateSolicitudCommand
-            {
-                SolicitudId = id
-            });
+            request.SolicitudId = id;
+            await _mediator.Send(request);
 
             return NoContent();
         }
@@ -131,6 +152,18 @@ namespace Csd.Comisiones.Api.Controllers
             if (result == null)
                 return NotFound();
 
+            return Ok(result);
+        }
+
+        [HttpPut("{solicitudId}/empleados/{empleadoId}/servicios")]
+        public async Task<IActionResult> ActualizarServicios(
+            int solicitudId,
+            int empleadoId,
+            [FromBody] ActualizarServiciosEmpleadoCommand command)
+        {
+            command.SolicitudId = solicitudId;
+            command.EmpleadoId = empleadoId;
+            var result = await _mediator.Send(command);
             return Ok(result);
         }
 

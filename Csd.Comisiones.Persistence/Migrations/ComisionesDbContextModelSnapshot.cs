@@ -471,7 +471,69 @@ namespace Csd.Comisiones.Persistence.Migrations
                     b.ToTable("ProveedorServicio", (string)null);
                 });
 
-            modelBuilder.Entity("Csd.Comisiones.Domain.Entities.Rol", b =>
+            modelBuilder.Entity("Csd.Comisiones.Domain.Entities.RespuestaProveedor", b =>
+                {
+                    b.Property<int>("RespuestaProveedorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RespuestaProveedorId"));
+
+                    b.Property<bool?>("Aceptado")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CreadoPor")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime>("FechaEnvio")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("FechaModificacion")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("FechaRespuesta")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("ModificadoPor")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("MotivoRechazo")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("ProveedorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SolicitudId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("Token")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Vigente")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.HasKey("RespuestaProveedorId");
+
+                    b.HasIndex("ProveedorId");
+
+                    b.HasIndex("SolicitudId");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.ToTable("RespuestaProveedor", (string)null);
+                });
+
+        modelBuilder.Entity("Csd.Comisiones.Domain.Entities.Rol", b =>
                 {
                     b.Property<int>("RolId")
                         .ValueGeneratedOnAdd()
@@ -506,7 +568,7 @@ namespace Csd.Comisiones.Persistence.Migrations
 
                     b.ToTable("Rol", (string)null);
                 });
-
+                
             modelBuilder.Entity("Csd.Comisiones.Domain.Entities.Solicitud", b =>
                 {
                     b.Property<int>("SolicitudId")
@@ -1067,6 +1129,25 @@ namespace Csd.Comisiones.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Proveedor");
+                });
+
+            modelBuilder.Entity("Csd.Comisiones.Domain.Entities.RespuestaProveedor", b =>
+                {
+                    b.HasOne("Csd.Comisiones.Domain.Entities.Proveedor", "Proveedor")
+                        .WithMany()
+                        .HasForeignKey("ProveedorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Csd.Comisiones.Domain.Entities.Solicitud", "Solicitud")
+                        .WithMany()
+                        .HasForeignKey("SolicitudId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Proveedor");
+
+                    b.Navigation("Solicitud");
                 });
 
             modelBuilder.Entity("Csd.Comisiones.Domain.Entities.Solicitud", b =>

@@ -1,86 +1,139 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html>
-<body style="margin:0; padding:0; background-color:#f4f6f8; font-family: Arial, sans-serif;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f8; padding:20px;">
-        <tr>
-            <td align="center">
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f8;
+      font-family: Arial, sans-serif;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f4f6f8; padding: 20px"
+    >
+      <tr>
+        <td align="center">
+          <!-- Contenedor -->
+          <table
+            width="800"
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              background: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            "
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                style="
+                  background: #0078d4;
+                  color: white;
+                  padding: 20px;
+                  text-align: center;
+                "
+              >
+                <h2 style="margin: 0">Solicitud pendiente de autorización</h2>
+              </td>
+            </tr>
 
-                <!-- Contenedor -->
-                <table width="800" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+            <!-- Body -->
+            <tr>
+              <td style="padding: 20px; color: #333">
+                <p>Hola,</p>
 
-                    <!-- Header -->
-                    <tr>
-                        <td style="background:#0078D4; color:white; padding:20px; text-align:center;">
-                            <h2 style="margin:0;">Solicitud pendiente de autorización</h2>
-                        </td>
+                <p>Tienes una solicitud pendiente de autorización.</p>
+
+                <p>
+                  <strong>Folio:</strong> {{Folio}} <br />
+                  <strong>Obra:</strong> {{Obra}} <br />
+                  <strong>Fecha inicio:</strong> {{FechaInicio}} <br />
+                  <strong>Fecha fin:</strong> {{FechaFin}}
+                </p>
+
+                <h3 style="margin-top: 30px">Empleados</h3>
+
+                <!-- Tabla -->
+                <table
+                  width="100%"
+                  border="0"
+                  cellpadding="10"
+                  cellspacing="0"
+                  style="border-collapse: collapse; margin-top: 10px"
+                >
+                  <thead>
+                    <tr
+                      style="
+                        background-color: #0078d4;
+                        color: white;
+                        text-align: center;
+                      "
+                    >
+                      <th>Nombre</th>
+                      <th>Fecha Inicio</th>
+                      <th>Fecha Fin</th>
+                      <th>Hotel</th>
+                      <th>Desayuno</th>
+                      <th>Almuerzo</th>
+                      <th>Cena</th>
+                      <th>Total</th>
                     </tr>
-
-                    <!-- Body -->
-                    <tr>
-                        <td style="padding:20px; color:#333;">
-
-                            <p>Hola,</p>
-
-                            <p>Tienes una solicitud pendiente de autorización.</p>
-
-                            <p>
-                                <strong>Folio:</strong> {{Folio}} <br />
-                                <strong>Obra:</strong> {{Obra}} <br />
-                                <strong>Fecha inicio:</strong> {{FechaInicio}} <br />
-                                <strong>Fecha fin:</strong> {{FechaFin}}
-                            </p>
-
-                            <h3 style="margin-top:30px;">Empleados</h3>
-
-                            <!-- Tabla -->
-                            <table width="100%" border="0" cellpadding="10" cellspacing="0" style="border-collapse: collapse; margin-top:10px;">
-                                <thead>
-                                    <tr style="background-color:#0078D4; color:white; text-align:center;">
-                                        <th>Nombre</th>
-                                        <th>Fecha Inicio</th>
-                                        <th>Fecha Fin</th>
-                                        <th>Hotel</th>
-                                        <th>Desayuno</th>
-                                        <th>Almuerzo</th>
-                                        <th>Cena</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{EmpleadosRows}}
-                                </tbody>
-                            </table>
-
-                            <!-- Botones -->
-                            <table width="100%" style="margin-top:30px;">
-                                <tr>
-                                    <td align="center">
-
-                                        <a href="{{UrlAprobar}}"
-                                           style="background-color:#28a745; color:white; padding:12px 25px;
-                                              text-decoration:none; border-radius:5px; display:inline-block; margin-right:10px;">
-                                            Aprobar
-                                        </a>
-
-                                        <a href="{{UrlRechazar}}"
-                                           style="background-color:#dc3545; color:white; padding:12px 25px;
-                                              text-decoration:none; border-radius:5px; display:inline-block;">
-                                            Rechazar
-                                        </a>
-
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <p style="margin-top:30px;">Saludos.</p>
-
-                        </td>
-                    </tr>
-
+                  </thead>
+                  <tbody>
+                    {{EmpleadosRows}}
+                  </tbody>
                 </table>
 
-            </td>
-        </tr>
+                <!-- Botones -->
+                <table width="100%" style="margin-top: 30px">
+                  <tr>
+                    <td align="center">
+                      <a
+                        href="{{UrlAprobar}}"
+                        style="
+                          background-color: #28a745;
+                          color: white;
+                          padding: 12px 25px;
+                          text-decoration: none;
+                          border-radius: 5px;
+                          display: inline-block;
+                          margin-right: 10px;
+                        "
+                      >
+                        Aprobar
+                      </a>
+
+                      <a
+                        href="{{UrlRechazar}}"
+                        style="
+                          background-color: #dc3545;
+                          color: white;
+                          padding: 12px 25px;
+                          text-decoration: none;
+                          border-radius: 5px;
+                          display: inline-block;
+                        "
+                      >
+                        Rechazar
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+
+                <p style="margin-top: 30px">Saludos.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
     </table>
-</body>
+  </body>
 </html>

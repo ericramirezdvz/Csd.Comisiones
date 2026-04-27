@@ -12,6 +12,12 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById
         public int EmpleadoId { get; set; }
         public string NumeroEmpleado { get; set; }
         public string NombreCompleto { get; set; }
+        public int AreaId { get; set; }
+        public string? Correo { get; set; }
+        public int TipoAsignacion { get; set; } // 1=Servicios, 2=Pago
+        public decimal? MontoPago { get; set; }
+        public DateTime FechaInicio { get; set; }
+        public DateTime FechaFin { get; set; }
 
         public List<HotelSolicitudDto> Hoteles { get; set; } = new();
         public List<ComidaSolicitudDto> Comidas { get; set; } = new();

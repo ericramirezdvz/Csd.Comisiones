@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f8;
+      font-family: Arial, sans-serif;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f4f6f8; padding: 20px"
+    >
+      <tr>
+        <td align="center">
+          <!-- Contenedor -->
+          <table
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              background: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+              max-width: 1200px;
+              width: 100%;
+            "
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                style="
+                  background: #06205c;
+                  color: white;
+                  padding: 20px;
+                  text-align: center;
+                "
+              >
+                <h2 style="margin: 0">
+                  Control de Alimentaci&oacute;n y Hospedaje
+                </h2>
+                <p style="margin: 5px 0 0; font-size: 14px; opacity: 0.9">
+                  Constructora Subacu&aacute;tica DIAVAZ
+                </p>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td style="padding: 20px; color: #333">
+                <p>
+                  <strong>Folio:</strong> {{Folio}} <br />
+                  <strong>Obra:</strong> {{Obra}} <br />
+                  <strong>&Aacute;rea:</strong> {{Area}} <br />
+                  <strong>Periodo:</strong> {{Periodo}}
+                </p>
+
+                <!-- ═══ CONTROL DE ALIMENTACIÓN ═══ -->
+                <h3
+                  style="
+                    margin-top: 30px;
+                    color: #06205c;
+                    border-bottom: 2px solid #01a29c;
+                    padding-bottom: 5px;
+                  "
+                >
+                  Control de Alimentaci&oacute;n
+                </h3>
+
+                <div style="overflow-x: auto">{{TablaAlimentacion}}</div>
+
+                <!-- ═══ CONTROL DE HOSPEDAJE ═══ -->
+                <h3
+                  style="
+                    margin-top: 40px;
+                    color: #06205c;
+                    border-bottom: 2px solid #01a29c;
+                    padding-bottom: 5px;
+                  "
+                >
+                  Control de Hospedaje
+                </h3>
+
+                <div style="overflow-x: auto">{{TablaHospedaje}}</div>
+
+                <p style="margin-top: 30px; font-size: 12px; color: #888">
+                  Este correo fue generado autom&aacute;ticamente por el Sistema
+                  de Comisiones DIAVAZ.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                style="
+                  background: #06205c;
+                  color: #ccc;
+                  text-align: center;
+                  padding: 12px;
+                  font-size: 12px;
+                "
+              >
+                Constructora Subacu&aacute;tica DIAVAZ &copy; 2026
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

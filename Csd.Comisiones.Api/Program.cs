@@ -22,20 +22,25 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
+var jwtSection = builder.Configuration.GetSection("JwtSettings");
+var jwtSecret = jwtSection["Secret"]!;
+var jwtIssuer = jwtSection["Issuer"]!;
+var jwtAudience = jwtSection["Audience"]!;
+
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = "tuIssuer",
+            ValidIssuer = jwtIssuer,
 
             ValidateAudience = true,
-            ValidAudience = "tuAudience",
+            ValidAudience = jwtAudience,
 
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes("TU_SECRET_KEY_SUPER_LARGA")
+                Encoding.UTF8.GetBytes(jwtSecret)
             )
         };
     });
@@ -60,6 +65,7 @@ app.UseCors("FrontendDev");
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

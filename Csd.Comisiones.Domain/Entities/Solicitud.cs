@@ -79,11 +79,10 @@ namespace Csd.Comisiones.Domain.Entities
             _empleados.Add(empleado);
         }
 
-        private void CambiarEstatus(EstatusSolicitudEnum nuevoEstatus)
+        private void CambiarEstatus(EstatusSolicitudEnum nuevoEstatus, string? comentarioSeguimiento = null)
         {
             EstatusSolicitudId = (int)nuevoEstatus;
-
-            RegistrarSeguimiento(nuevoEstatus);
+            RegistrarSeguimiento(nuevoEstatus, comentarioSeguimiento);
         }
 
         public void ActualizarComentarios(string? comentarios)
@@ -91,12 +90,11 @@ namespace Csd.Comisiones.Domain.Entities
             Comentarios = comentarios;
         }
 
-        private void RegistrarSeguimiento(EstatusSolicitudEnum estatus)
+        private void RegistrarSeguimiento(EstatusSolicitudEnum estatus, string? comentario = null)
         {
             var seguimiento = new SolicitudSeguimiento(
                 estatus,
-                Comentarios);
-
+                comentario);
             _seguimientos.Add(seguimiento);
         }
 
@@ -106,10 +104,18 @@ namespace Csd.Comisiones.Domain.Entities
             int ciudadId,
             DateTime fechaInicio,
             DateTime fechaFin,
-            string? comentarios)
+            string? comentarios,
+            int? motivoSolicitudId = null)
         {
-            if (EstatusSolicitudId != (int)EstatusSolicitudEnum.Borrador)
-                throw new InvalidOperationException("Solo se puede editar en estatus Borrador");
+            var estatusPermitidos = new[]
+            {
+                (int)EstatusSolicitudEnum.Borrador,
+                (int)EstatusSolicitudEnum.AutorizadaPorResponsableDeObra,
+                (int)EstatusSolicitudEnum.EnProceso
+            };
+
+            if (!estatusPermitidos.Contains(EstatusSolicitudId))
+                throw new InvalidOperationException("Solo se puede editar en estatus Borrador, Autorizada o En Proceso");
 
             if (fechaFin < fechaInicio)
                 throw new ArgumentException("La fecha fin no puede ser menor a la fecha inicio.");
@@ -120,12 +126,20 @@ namespace Csd.Comisiones.Domain.Entities
             FechaInicio = fechaInicio;
             FechaFin = fechaFin;
             Comentarios = comentarios;
+            MotivoSolicitudId = motivoSolicitudId;
         }
 
         public void LimpiarEmpleados()
         {
-            if (EstatusSolicitudId != (int)EstatusSolicitudEnum.Borrador)
-                throw new InvalidOperationException("Solo se puede editar en estatus Borrador");
+            var estatusPermitidos = new[]
+            {
+                (int)EstatusSolicitudEnum.Borrador,
+                (int)EstatusSolicitudEnum.AutorizadaPorResponsableDeObra,
+                (int)EstatusSolicitudEnum.EnProceso
+            };
+
+            if (!estatusPermitidos.Contains(EstatusSolicitudId))
+                throw new InvalidOperationException("Solo se puede editar en estatus Borrador, Autorizada o En Proceso");
 
             _empleados.Clear();
         }
@@ -138,7 +152,7 @@ namespace Csd.Comisiones.Domain.Entities
             if (!_empleados.Any())
                 throw new InvalidOperationException("Debe existir al menos un empleado");
 
-            CambiarEstatus(EstatusSolicitudEnum.EnAutorizaciónPorResponsableDeObra);
+            CambiarEstatus(EstatusSolicitudEnum.EnAutorizaciónPorResponsableDeObra, "Solicitud enviada a autorización");
         }
 
         public void Aprobar()
@@ -146,9 +160,8 @@ namespace Csd.Comisiones.Domain.Entities
             if (EstatusSolicitudId != (int)EstatusSolicitudEnum.EnAutorizaciónPorResponsableDeObra)
                 throw new InvalidOperationException("No se puede aprobar en este estado");
 
-            CambiarEstatus(EstatusSolicitudEnum.AutorizadaPorResponsableDeObra);
-
-            CambiarEstatus(EstatusSolicitudEnum.EnProceso);
+            CambiarEstatus(EstatusSolicitudEnum.AutorizadaPorResponsableDeObra, "Solicitud autorizada por responsable de obra");
+            CambiarEstatus(EstatusSolicitudEnum.EnProceso, "Solicitud en proceso — pendiente de asignación de bloques");
         }
 
         public void Rechazar(int autorizadorId, string? comentario)
@@ -168,8 +181,7 @@ namespace Csd.Comisiones.Domain.Entities
             autorizacion.Rechazar(comentario);
 
             Comentarios = comentario;
-
-            CambiarEstatus(EstatusSolicitudEnum.Rechazada);
+            CambiarEstatus(EstatusSolicitudEnum.Rechazada, comentario);
         }
 
         public void Terminar()
@@ -191,7 +203,7 @@ namespace Csd.Comisiones.Domain.Entities
                         $"El empleado {empleado.EmpleadoId} no tiene servicios asignados");
             }
 
-            CambiarEstatus(EstatusSolicitudEnum.Terminada);
+            CambiarEstatus(EstatusSolicitudEnum.Terminada, "Checkout completado — Solped generada");
         }
 
         public void Cancelar(string? comentario)
@@ -203,8 +215,7 @@ namespace Csd.Comisiones.Domain.Entities
                 throw new InvalidOperationException("La solicitud ya está cancelada");
 
             Comentarios = comentario;
-
-            CambiarEstatus(EstatusSolicitudEnum.Cancelada);
+            CambiarEstatus(EstatusSolicitudEnum.Cancelada, comentario ?? "Solicitud cancelada");
         }
     }
 }

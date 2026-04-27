@@ -31,20 +31,32 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById
                     ObraNombre = s.Obra.Nombre,
 
                     AreaId = s.AreaId,
+                    AreaNombre = s.Area.Nombre,
+                    CiudadId = s.CiudadId,
 
                     EstatusSolicitudId = s.EstatusSolicitudId,
                     EstatusNombre = s.Estatus.Nombre,
 
                     FechaInicio = s.FechaInicio,
                     FechaFin = s.FechaFin,
+                    FechaCreacion = s.FechaCreacion,
 
                     Comentarios = s.Comentarios,
+
+                    MotivoSolicitudId = s.MotivoSolicitudId,
+                    MotivoSolicitudNombre = s.MotivoSolicitud != null ? s.MotivoSolicitud.Nombre : null,
 
                     Empleados = s.Empleados.Select(e => new EmpleadoSolicitudDto
                     {
                         EmpleadoId = e.EmpleadoId,
                         NombreCompleto = e.Empleado.NombreCompleto,
                         NumeroEmpleado = e.Empleado.NumeroEmpleado,
+                        AreaId = e.Empleado.AreaId,
+                        Correo = e.Empleado.Correo,
+                        TipoAsignacion = (int)e.TipoAsignacion,
+                        MontoPago = e.MontoPago,
+                        FechaInicio = e.FechaInicio,
+                        FechaFin = e.FechaFin,
 
                         Hoteles = e.Hoteles.Select(h => new HotelSolicitudDto
                         {

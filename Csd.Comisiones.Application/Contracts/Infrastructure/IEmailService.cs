@@ -12,6 +12,7 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
     {
         Task SendSolicitudPendienteAsync(
             int solicitudId,
+            int autorizadorId,
             string correo,
             string folio,
             string obra,
@@ -40,6 +41,41 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
             string correo,
             string proveedorNombre,
             string folio,
-            List<ProveedorDetalleDto> detalles);
+            string subFolio,
+            List<ProveedorDetalleDto> detalles,
+            Guid token,
+            bool esConciliacion = false);
+
+        Task SendProveedorRechazoNotificacionAsync(
+            string folio,
+            string proveedorNombre,
+            string motivo);
+
+        Task SendSolpedAsync(
+            string folio,
+            string obra,
+            string area,
+            string periodo,
+            string tablaAlimentacion,
+            string tablaHospedaje,
+            byte[]? excelAdjunto = null);
+
+        /// <summary>
+        /// Envía el "Generador de Servicios y Subcontratos" (Excel) a un proveedor.
+        /// </summary>
+        Task SendGeneradorProveedorAsync(
+            string correoProveedor,
+            string proveedorNombre,
+            string folio,
+            byte[] excelAdjunto);
+
+        Task SendSolicitudProveedorModificadaAsync(
+            string correo,
+            string proveedorNombre,
+            string folio,
+            string empleadoNombre,
+            List<ProveedorDetalleDto> eliminados,
+            List<ProveedorDetalleDto> vigentes,
+            Guid token);
     }
 }

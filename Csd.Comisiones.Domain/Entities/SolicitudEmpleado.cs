@@ -71,11 +71,6 @@ namespace Csd.Comisiones.Domain.Entities
             if (monto <= 0)
                 throw new ArgumentException("El monto debe ser mayor a 0");
 
-            var hoy = DateTime.Now.Date;
-
-            if (fechaInicio.Date < hoy.AddDays(3))
-                throw new InvalidOperationException("No se pueden crear solicitudes de pago con menos de 3 días de anticipación");
-
             return new SolicitudEmpleado
             {
                 EmpleadoId = empleadoId,

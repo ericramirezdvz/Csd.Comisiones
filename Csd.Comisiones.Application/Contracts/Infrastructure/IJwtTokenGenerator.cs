@@ -8,6 +8,6 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
 {
     public interface IJwtTokenGenerator
     {
-        string GenerateToken(string username, List<string> roles);
+        string GenerateToken(int usuarioId, string username, List<string> roles);
     }
 }

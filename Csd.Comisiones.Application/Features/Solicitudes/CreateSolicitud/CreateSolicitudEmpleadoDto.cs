@@ -14,6 +14,10 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud
 
         public DateTime FechaFin { get; set; }
 
+        public int TipoAsignacion { get; set; } = 1;
+
+        public decimal? MontoPago { get; set; }
+
         public List<CreateSolicitudHotelDto> Hoteles { get; set; } = new();
 
         public List<CreateSolicitudComidaDto> Comidas { get; set; } = new();

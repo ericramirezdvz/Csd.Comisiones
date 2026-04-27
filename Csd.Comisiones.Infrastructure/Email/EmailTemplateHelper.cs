@@ -15,7 +15,7 @@ namespace Csd.Comisiones.Infrastructure.Email
                 "Templates",
                 templateName);
 
-            return File.ReadAllText(path);
+            return File.ReadAllText(path, Encoding.UTF8);
         }
 
         public static string Replace(string template, Dictionary<string, string> values)

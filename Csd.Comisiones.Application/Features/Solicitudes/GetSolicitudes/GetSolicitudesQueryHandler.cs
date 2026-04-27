@@ -28,6 +28,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudes
         {
             var query = _context.Solicitud
                 .AsNoTracking()
+                .Where(s => request.SolicitanteId == null || s.SolicitanteId == request.SolicitanteId)
                 .Select(s => new SolicitudListItemDto
                 {
                     SolicitudId = s.SolicitudId,
@@ -36,11 +37,21 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudes
                     ObraId = s.ObraId,
                     ObraNombre = s.Obra.Nombre,
 
+                    AreaId = s.AreaId,
+                    AreaNombre = s.Area.Nombre,
+
                     EstatusSolicitudId = s.EstatusSolicitudId,
                     EstatusNombre = s.Estatus.Nombre,
 
                     FechaInicio = s.FechaInicio,
                     FechaFin = s.FechaFin,
+
+                    Comentarios = s.Comentarios,
+
+                    MotivoSolicitudId = s.MotivoSolicitudId,
+                    MotivoSolicitudNombre = s.MotivoSolicitud != null ? s.MotivoSolicitud.Nombre : null,
+
+                    FechaCreacion = s.FechaCreacion,
 
                     TotalEmpleados = s.Empleados.Count(),
                     TotalHoteles = s.Empleados.SelectMany(e => e.Hoteles).Count(),
