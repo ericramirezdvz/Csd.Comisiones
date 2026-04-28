@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Csd.Comisiones.Application.Common.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,6 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
 {
     public interface IFileParserService
     {
-        Task<List<string>> LeerNumerosEmpleadoAsync(Stream stream, string fileName);
+        List<EmpleadoImportadoDto> LeerNumerosEmpleadoAsync(Stream stream, string fileName);
     }
 }
