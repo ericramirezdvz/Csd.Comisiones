@@ -57,7 +57,7 @@ namespace Csd.Comisiones.Application.Features.Proveedores.SendProveedores
                     {
                         ProveedorId = h.Proveedor.ProveedorId,
                         Proveedor = h.Proveedor,
-                        EmpleadoNombre = e.Empleado.NombreCompleto,
+                        EmpleadoNombre = e.EsExterno ? (e.NombreExterno ?? "Externo") : (e.Empleado?.NombreCompleto ?? "Sin nombre"),
                         TipoServicio = h.TipoHabitacionId == 2 ? "Hospedaje - Doble" : "Hospedaje - Sencilla",
                         TipoHabitacionId = (int?)h.TipoHabitacionId,
                         FechaInicio = h.FechaInicio,
@@ -75,7 +75,7 @@ namespace Csd.Comisiones.Application.Features.Proveedores.SendProveedores
                     {
                         ProveedorId = c.Proveedor.ProveedorId,
                         Proveedor = c.Proveedor,
-                        EmpleadoNombre = e.Empleado.NombreCompleto,
+                        EmpleadoNombre = e.EsExterno ? (e.NombreExterno ?? "Externo") : (e.Empleado?.NombreCompleto ?? "Sin nombre"),
                         TipoServicio = c.TipoComidaId == 1 ? "Desayuno" : c.TipoComidaId == 2 ? "Comida" : "Cena",
                         TipoHabitacionId = (int?)null,
                         FechaInicio = c.FechaInicio,

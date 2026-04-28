@@ -135,8 +135,8 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.EnviarSolped
             foreach (var emp in empleados)
             {
                 sb.Append("<tr style='border-bottom:1px solid #eee; text-align:center;'>");
-                sb.Append($"<td style='padding:4px; border:1px solid #eee; text-align:left; white-space:nowrap;'>{emp.Empleado.NombreCompleto}</td>");
-                sb.Append($"<td style='padding:4px; border:1px solid #eee;'>{emp.Empleado.NumeroEmpleado}</td>");
+                sb.Append($"<td style='padding:4px; border:1px solid #eee; text-align:left; white-space:nowrap;'>{(emp.EsExterno ? (emp.NombreExterno ?? "Externo") : (emp.Empleado?.NombreCompleto ?? "Sin nombre"))}</td>");
+                sb.Append($"<td style='padding:4px; border:1px solid #eee;'>{(emp.EsExterno ? "" : (emp.Empleado?.NumeroEmpleado ?? ""))}</td>");
 
                 int totalServicios = 0;
 
@@ -221,8 +221,8 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.EnviarSolped
                 bool esDoble = hotelActivo?.TipoHabitacionId == 2;
 
                 sb.Append("<tr style='border-bottom:1px solid #eee; text-align:center;'>");
-                sb.Append($"<td style='padding:4px; border:1px solid #eee; text-align:left; white-space:nowrap;'>{emp.Empleado.NombreCompleto}</td>");
-                sb.Append($"<td style='padding:4px; border:1px solid #eee;'>{emp.Empleado.NumeroEmpleado}</td>");
+                sb.Append($"<td style='padding:4px; border:1px solid #eee; text-align:left; white-space:nowrap;'>{(emp.EsExterno ? (emp.NombreExterno ?? "Externo") : (emp.Empleado?.NombreCompleto ?? "Sin nombre"))}</td>");
+                sb.Append($"<td style='padding:4px; border:1px solid #eee;'>{(emp.EsExterno ? "" : (emp.Empleado?.NumeroEmpleado ?? ""))}</td>");
                 sb.Append($"<td style='padding:4px; border:1px solid #eee;'>{tipoHab}</td>");
 
                 int totalDias = 0;

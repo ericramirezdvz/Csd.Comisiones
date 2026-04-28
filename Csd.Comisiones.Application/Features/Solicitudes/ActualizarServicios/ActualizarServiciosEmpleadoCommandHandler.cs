@@ -238,7 +238,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.ActualizarServicios
                             FechaInicio = s.inicio,
                             FechaFin = s.fin,
                             PrecioUnitario = s.precio,
-                            Empleados = new List<string> { empleado.Empleado.NombreCompleto }
+                            Empleados = new List<string> { empleado.EsExterno ? (empleado.NombreExterno ?? "Externo") : (empleado.Empleado?.NombreCompleto ?? "Sin nombre") }
                         }).ToList();
 
                     // Servicios que quedan vigentes actualmente
@@ -253,7 +253,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.ActualizarServicios
                             FechaInicio = s.inicio,
                             FechaFin = s.fin,
                             PrecioUnitario = s.precio,
-                            Empleados = new List<string> { empleado.Empleado.NombreCompleto }
+                            Empleados = new List<string> { empleado.EsExterno ? (empleado.NombreExterno ?? "Externo") : (empleado.Empleado?.NombreCompleto ?? "Sin nombre") }
                         }).ToList();
 
                     // Solo enviar email si hubo cambios reales
@@ -264,7 +264,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.ActualizarServicios
                         proveedor.Correo,
                         proveedor.Nombre,
                         solicitud.Folio,
-                        empleado.Empleado.NombreCompleto,
+                        empleado.EsExterno ? (empleado.NombreExterno ?? "Externo") : (empleado.Empleado?.NombreCompleto ?? "Sin nombre"),
                         eliminados,
                         vigentes,
                         respuesta.Token);

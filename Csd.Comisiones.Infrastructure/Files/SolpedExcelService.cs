@@ -41,8 +41,8 @@ namespace Csd.Comisiones.Infrastructure.Files
                         {
                             Concepto = "HOSPEDAJE",
                             TipoDetalle = tipoHab,
-                            EmpleadoNombre = emp.Empleado.NombreCompleto,
-                            NumeroPersonal = emp.Empleado.NumeroEmpleado,
+                            EmpleadoNombre = emp.EsExterno ? (emp.NombreExterno ?? "Externo") : (emp.Empleado?.NombreCompleto ?? "Sin nombre"),
+                            NumeroPersonal = emp.EsExterno ? "" : (emp.Empleado?.NumeroEmpleado ?? ""),
                             FechaInicio = h.FechaInicio.Date,
                             FechaFin = h.FechaFin.Date,
                             PrecioUnitario = h.PrecioUnitario,
@@ -72,8 +72,8 @@ namespace Csd.Comisiones.Infrastructure.Files
                         {
                             Concepto = tipoComida,
                             TipoDetalle = tipoComida,
-                            EmpleadoNombre = emp.Empleado.NombreCompleto,
-                            NumeroPersonal = emp.Empleado.NumeroEmpleado,
+                            EmpleadoNombre = emp.EsExterno ? (emp.NombreExterno ?? "Externo") : (emp.Empleado?.NombreCompleto ?? "Sin nombre"),
+                            NumeroPersonal = emp.EsExterno ? "" : (emp.Empleado?.NumeroEmpleado ?? ""),
                             FechaInicio = c.FechaInicio.Date,
                             FechaFin = c.FechaFin.Date,
                             PrecioUnitario = c.PrecioUnitario,
