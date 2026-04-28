@@ -29,22 +29,53 @@ namespace Csd.Comisiones.Application.Features.Empleados.ImportEmpleados
             ImportEmpleadosCommand request,
             CancellationToken cancellationToken)
         {
-            var numerosEmpleado = await _fileParserService
+            var importados = _fileParserService
                 .LeerNumerosEmpleadoAsync(request.FileStream, request.FileName);
 
-            numerosEmpleado = numerosEmpleado.Distinct().ToList();
+            var numerosEmpleado = importados
+                .Where(x => !string.IsNullOrWhiteSpace(x.NumeroEmpleado))
+                .Select(x => x.NumeroEmpleado!)
+                .Distinct()
+                .ToList();
 
-            var empleados = await _context.Empleado
+            var empleadosDb = await _context.Empleado
                 .Where(e => numerosEmpleado.Contains(e.NumeroEmpleado))
                 .ToListAsync(cancellationToken);
 
-            return empleados.Select(e => new EmpleadoDto
+            var empleadosDict = empleadosDb.ToDictionary(e => e.NumeroEmpleado);
+
+            var resultado = new List<EmpleadoDto>();
+
+            foreach (var item in importados)
             {
-                EmpleadoId = e.EmpleadoId,
-                NumeroEmpleado = e.NumeroEmpleado,
-                NombreCompleto = e.NombreCompleto,
-                Correo = e.Correo
-            }).ToList();
+                //  EMPLEADO INTERNO
+                if (!string.IsNullOrWhiteSpace(item.NumeroEmpleado) &&
+                    empleadosDict.TryGetValue(item.NumeroEmpleado, out var emp))
+                {
+                    resultado.Add(new EmpleadoDto
+                    {
+                        EmpleadoId = emp.EmpleadoId,
+                        NumeroEmpleado = emp.NumeroEmpleado,
+                        NombreCompleto = emp.NombreCompleto,
+                        Correo = emp.Correo,
+                        EsExterno = false
+                    });
+                }
+                // EXTERNO
+                else if (!string.IsNullOrWhiteSpace(item.NombreExterno))
+                {
+                    resultado.Add(new EmpleadoDto
+                    {
+                        EmpleadoId = null,
+                        NumeroEmpleado = null,
+                        NombreCompleto = item.NombreExterno,
+                        Correo = null,
+                        EsExterno = true
+                    });
+                }
+            }
+
+            return resultado;
         }
     }
 }
