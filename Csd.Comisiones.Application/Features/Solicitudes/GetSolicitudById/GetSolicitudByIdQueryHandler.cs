@@ -49,12 +49,15 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById
                     Empleados = s.Empleados.Select(e => new EmpleadoSolicitudDto
                     {
                         EmpleadoId = e.EmpleadoId.HasValue ? e.EmpleadoId.Value : 0,
-                        NombreCompleto = e.Empleado.NombreCompleto,
-                        NumeroEmpleado = e.Empleado.NumeroEmpleado,
-                        AreaId = e.Empleado.AreaId,
-                        Correo = e.Empleado.Correo,
+                        NombreCompleto = e.EsExterno ? e.NombreExterno : (e.Empleado != null ? e.Empleado.NombreCompleto : ""),
+                        NumeroEmpleado = e.EsExterno ? "" : (e.Empleado != null ? e.Empleado.NumeroEmpleado : ""),
+                        AreaId = e.EsExterno ? 0 : (e.Empleado != null ? e.Empleado.AreaId : 0),
+                        Correo = e.EsExterno ? null : (e.Empleado != null ? e.Empleado.Correo : null),
                         TipoAsignacion = (int)e.TipoAsignacion,
                         MontoPago = e.MontoPago,
+                        TipoPago = e.TipoPago.HasValue ? (int)e.TipoPago : null,
+                        EsExterno = e.EsExterno,
+                        NombreExterno = e.NombreExterno,
                         FechaInicio = e.FechaInicio,
                         FechaFin = e.FechaFin,
 

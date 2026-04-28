@@ -73,9 +73,6 @@ namespace Csd.Comisiones.Domain.Entities
             if (fechaFin < fechaInicio)
                 throw new ArgumentException("La fecha fin no puede ser menor a la fecha inicio.");
 
-            if (monto <= 0)
-                throw new ArgumentException("El monto debe ser mayor a 0");
-
             if (esExterno && string.IsNullOrWhiteSpace(nombreExterno))
                 throw new ArgumentException("El nombre del externo es requerido");
 
@@ -85,10 +82,12 @@ namespace Csd.Comisiones.Domain.Entities
             return new SolicitudEmpleado
             {
                 EmpleadoId = empleadoId,
+                NombreExterno = nombreExterno,
+                EsExterno = esExterno,
                 FechaInicio = fechaInicio,
                 FechaFin = fechaFin,
                 TipoAsignacion = TipoAsignacionEnum.Pago,
-                MontoPago = monto,
+                MontoPago = monto > 0 ? monto : null,
                 TipoPago = tipoPago
             };
         }
