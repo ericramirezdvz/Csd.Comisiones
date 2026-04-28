@@ -98,6 +98,22 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CompleteSolicitud
             }
 
             await ((DbContext)_context).SaveChangesAsync(cancellationToken);
+
+            // Notificar al solicitante que la comisión fue completada
+            var solicitante = await _context.Usuario
+                .FirstOrDefaultAsync(u => u.UsuarioId == solicitud.SolicitanteId, cancellationToken);
+
+            var correoSolicitante = solicitante?.Email ?? solicitante?.Username;
+            if (!string.IsNullOrEmpty(correoSolicitante))
+            {
+                await _emailService.SendComisionTerminadaAsync(
+                    correoSolicitante,
+                    solicitud.Folio,
+                    solicitud.ObraId.ToString(),
+                    solicitud.FechaInicio,
+                    solicitud.FechaFin);
+            }
+
             return Unit.Value;
         }
 

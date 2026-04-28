@@ -158,6 +158,15 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.ApproveSolicitud
                 empleadosEmail
             );
 
+            // Notificar al solicitante que la comisión está en proceso
+            await _emailService.SendComisionEnProcesoAsync(
+                correoSolicitante,
+                solicitud.Folio,
+                solicitud.ObraId.ToString(),
+                solicitud.FechaInicio,
+                solicitud.FechaFin
+            );
+
             return true;
         }
     }

@@ -207,7 +207,8 @@ namespace Csd.Comisiones.Infrastructure.Email
     string subFolio,
     List<ProveedorDetalleDto> detalles,
     Guid token,
-    bool esConciliacion = false)
+    bool esConciliacion = false,
+    string? ccCorreo = null)
         {
             var templateName = esConciliacion
                 ? "SolicitudProveedor.html"
@@ -263,6 +264,9 @@ namespace Csd.Comisiones.Infrastructure.Email
 
             email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
             email.To.Add(MailboxAddress.Parse(correo));
+            var cc = !string.IsNullOrEmpty(ccCorreo) ? ccCorreo : _settings.SenderEmail;
+            if (!string.IsNullOrEmpty(cc) && cc != correo)
+                email.Cc.Add(MailboxAddress.Parse(cc));
             email.Subject = esConciliacion
                 ? $"Conciliación de servicios - {subFolio}"
                 : $"Solicitud de servicios - {subFolio}";
@@ -411,7 +415,8 @@ namespace Csd.Comisiones.Infrastructure.Email
             string empleadoNombre,
             List<ProveedorDetalleDto> eliminados,
             List<ProveedorDetalleDto> vigentes,
-            Guid token)
+            Guid token,
+            string? ccCorreo = null)
         {
             var template = EmailTemplateHelper.LoadTemplate("SolicitudProveedorModificacion.html");
 
@@ -517,7 +522,134 @@ namespace Csd.Comisiones.Infrastructure.Email
             var email = new MimeMessage();
             email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
             email.To.Add(MailboxAddress.Parse(correo));
+            var ccMod = !string.IsNullOrEmpty(ccCorreo) ? ccCorreo : _settings.SenderEmail;
+            if (!string.IsNullOrEmpty(ccMod) && ccMod != correo)
+                email.Cc.Add(MailboxAddress.Parse(ccMod));
             email.Subject = $"⚠️ Modificación de servicios - {folio}";
+
+            var builder = new BodyBuilder { HtmlBody = body };
+            email.Body = builder.ToMessageBody();
+
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_settings.Server, _settings.Port,
+                _settings.UseSSL ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto);
+            await smtp.AuthenticateAsync(_settings.Username, _settings.Password);
+            await smtp.SendAsync(email);
+            await smtp.DisconnectAsync(true);
+        }
+
+        public async Task SendProveedorAceptacionNotificacionAsync(
+            string folio,
+            string proveedorNombre)
+        {
+            var template = EmailTemplateHelper.LoadTemplate("ProveedorAceptacionNotificacion.html");
+
+            var body = EmailTemplateHelper.Replace(template, new Dictionary<string, string>
+            {
+                { "Proveedor", proveedorNombre },
+                { "Folio", folio }
+            });
+
+            var correoDestino = _settings.SenderEmail;
+
+            var email = new MimeMessage();
+            email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
+            email.To.Add(MailboxAddress.Parse(correoDestino));
+            email.Subject = $"✅ Proveedor aceptó servicios - {folio}";
+
+            var builder = new BodyBuilder { HtmlBody = body };
+            email.Body = builder.ToMessageBody();
+
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_settings.Server, _settings.Port,
+                _settings.UseSSL ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto);
+            await smtp.AuthenticateAsync(_settings.Username, _settings.Password);
+            await smtp.SendAsync(email);
+            await smtp.DisconnectAsync(true);
+        }
+
+        public async Task SendTodosProveedoresConfirmadosAsync(
+            string folio)
+        {
+            var template = EmailTemplateHelper.LoadTemplate("TodosProveedoresConfirmados.html");
+
+            var body = EmailTemplateHelper.Replace(template, new Dictionary<string, string>
+            {
+                { "Folio", folio }
+            });
+
+            var correoDestino = _settings.SenderEmail;
+
+            var email = new MimeMessage();
+            email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
+            email.To.Add(MailboxAddress.Parse(correoDestino));
+            email.Subject = $"✅ Todos los proveedores confirmaron - {folio}";
+
+            var builder = new BodyBuilder { HtmlBody = body };
+            email.Body = builder.ToMessageBody();
+
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_settings.Server, _settings.Port,
+                _settings.UseSSL ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto);
+            await smtp.AuthenticateAsync(_settings.Username, _settings.Password);
+            await smtp.SendAsync(email);
+            await smtp.DisconnectAsync(true);
+        }
+
+        public async Task SendComisionEnProcesoAsync(
+            string correo,
+            string folio,
+            string obra,
+            DateTime fechaInicio,
+            DateTime fechaFin)
+        {
+            var template = EmailTemplateHelper.LoadTemplate("ComisionEnProceso.html");
+
+            var body = EmailTemplateHelper.Replace(template, new Dictionary<string, string>
+            {
+                { "Folio", folio },
+                { "Obra", obra },
+                { "FechaInicio", fechaInicio.ToString("dd/MM/yyyy") },
+                { "FechaFin", fechaFin.ToString("dd/MM/yyyy") }
+            });
+
+            var email = new MimeMessage();
+            email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
+            email.To.Add(MailboxAddress.Parse(correo));
+            email.Subject = $"Comisión {folio} en proceso";
+
+            var builder = new BodyBuilder { HtmlBody = body };
+            email.Body = builder.ToMessageBody();
+
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_settings.Server, _settings.Port,
+                _settings.UseSSL ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto);
+            await smtp.AuthenticateAsync(_settings.Username, _settings.Password);
+            await smtp.SendAsync(email);
+            await smtp.DisconnectAsync(true);
+        }
+
+        public async Task SendComisionTerminadaAsync(
+            string correo,
+            string folio,
+            string obra,
+            DateTime fechaInicio,
+            DateTime fechaFin)
+        {
+            var template = EmailTemplateHelper.LoadTemplate("ComisionTerminada.html");
+
+            var body = EmailTemplateHelper.Replace(template, new Dictionary<string, string>
+            {
+                { "Folio", folio },
+                { "Obra", obra },
+                { "FechaInicio", fechaInicio.ToString("dd/MM/yyyy") },
+                { "FechaFin", fechaFin.ToString("dd/MM/yyyy") }
+            });
+
+            var email = new MimeMessage();
+            email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
+            email.To.Add(MailboxAddress.Parse(correo));
+            email.Subject = $"Comisión {folio} completada";
 
             var builder = new BodyBuilder { HtmlBody = body };
             email.Body = builder.ToMessageBody();

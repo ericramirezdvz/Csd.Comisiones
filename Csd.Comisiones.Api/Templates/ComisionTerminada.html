@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f8;
+      font-family: Arial, sans-serif;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f4f6f8; padding: 20px"
+    >
+      <tr>
+        <td align="center">
+          <table
+            width="600"
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              background: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            "
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                style="
+                  background: #2e7d32;
+                  color: white;
+                  padding: 20px;
+                  text-align: center;
+                "
+              >
+                <h2 style="margin: 0">✅ Comisión completada</h2>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td style="padding: 30px; color: #333">
+                <p>
+                  La solicitud <strong>{{Folio}}</strong> ha sido
+                  <strong style="color: #2e7d32">completada</strong>
+                  exitosamente.
+                </p>
+
+                <table
+                  width="100%"
+                  cellpadding="8"
+                  cellspacing="0"
+                  style="
+                    margin: 15px 0;
+                    border-collapse: collapse;
+                    background: #e8f5e9;
+                    border-radius: 4px;
+                  "
+                >
+                  <tr>
+                    <td style="font-weight: bold; width: 120px">Obra:</td>
+                    <td>{{Obra}}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: bold">Periodo:</td>
+                    <td>{{FechaInicio}} — {{FechaFin}}</td>
+                  </tr>
+                </table>
+
+                <p style="margin-top: 20px">
+                  Se ha realizado el checkout y se generó la Solped definitiva.
+                  Los proveedores han sido notificados para la conciliación
+                  final.
+                </p>
+
+                <p
+                  style="
+                    color: #888;
+                    font-size: 12px;
+                    margin-top: 25px;
+                    text-align: center;
+                  "
+                >
+                  Este correo fue generado automáticamente por el sistema de
+                  comisiones de DIAVAZ.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
