@@ -15,4 +15,7 @@
 *.pubxml
 *.pubxml.user
 
+# Logs
+Logs/
+
 
