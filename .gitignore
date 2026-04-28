@@ -11,4 +11,8 @@
 /Csd.Comisiones.Persistence/bin
 /Csd.Comisiones.Persistence/obj
 
+# Publish profiles
+*.pubxml
+*.pubxml.user
+
 
