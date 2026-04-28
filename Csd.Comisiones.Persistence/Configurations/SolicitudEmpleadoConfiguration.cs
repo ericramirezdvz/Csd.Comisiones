@@ -17,7 +17,17 @@ namespace Csd.Comisiones.Persistence.Configurations
 
             builder.HasKey(x => x.SolicitudEmpleadoId);
 
+            // 🔹 Empleado ahora es opcional
             builder.Property(x => x.EmpleadoId)
+                .IsRequired(false);
+
+            // 🔹 Nuevo campo: NombreExterno
+            builder.Property(x => x.NombreExterno)
+                .HasMaxLength(200)
+                .IsRequired(false);
+
+            // Nuevo campo: EsExterno
+            builder.Property(x => x.EsExterno)
                 .IsRequired();
 
             builder.Property(x => x.FechaInicio)
@@ -26,18 +36,23 @@ namespace Csd.Comisiones.Persistence.Configurations
             builder.Property(x => x.FechaFin)
                 .IsRequired();
 
-            // Relación con Solicitud Empleado
+            builder.Property(x => x.TipoPago)
+                .HasConversion<int>()
+                .IsRequired(false);
+
+            // Relación con Solicitud
             builder
                 .HasOne(x => x.Solicitud)
                 .WithMany(x => x.Empleados)
-                .HasForeignKey(x => x.SolicitudId);
+                .HasForeignKey(x => x.SolicitudId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // Relación con Empleado
+            // Relación con Empleado (ahora opcional)
             builder
                 .HasOne(x => x.Empleado)
                 .WithMany()
                 .HasForeignKey(x => x.EmpleadoId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

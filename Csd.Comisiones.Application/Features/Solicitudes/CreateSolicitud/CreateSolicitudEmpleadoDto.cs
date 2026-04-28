@@ -8,7 +8,11 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud
 {
     public class CreateSolicitudEmpleadoDto
     {
-        public int EmpleadoId { get; set; }
+        public int? EmpleadoId { get; set; }
+
+        public string? NombreExterno { get; set; }
+
+        public bool EsExterno { get; set; }
 
         public DateTime FechaInicio { get; set; }
 
@@ -17,6 +21,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud
         public int TipoAsignacion { get; set; } = 1;
 
         public decimal? MontoPago { get; set; }
+        public int? TipoPago { get; set; }
 
         public List<CreateSolicitudHotelDto> Hoteles { get; set; } = new();
 

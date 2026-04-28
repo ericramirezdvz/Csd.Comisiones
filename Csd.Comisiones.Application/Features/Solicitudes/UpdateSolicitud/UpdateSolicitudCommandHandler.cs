@@ -1,5 +1,6 @@
 ﻿using Csd.Comisiones.Application.Contracts.Persistence;
 using Csd.Comisiones.Domain.Entities;
+using Csd.Comisiones.Domain.Enums;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -39,42 +40,62 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.UpdateSolicitud
 
             foreach (var empleadoDto in request.Empleados)
             {
-                var solicitudEmpleado = empleadoDto.TipoAsignacion == 2 && empleadoDto.MontoPago.HasValue
-                    ? SolicitudEmpleado.CrearPago(
+                SolicitudEmpleado solicitudEmpleado;
+
+                var esPago = empleadoDto.TipoAsignacion == (int)TipoAsignacionEnum.Pago;
+
+                if (esPago)
+                {
+                    solicitudEmpleado = SolicitudEmpleado.CrearPago(
                         empleadoDto.EmpleadoId,
+                        empleadoDto.NombreExterno,
+                        empleadoDto.EsExterno,
                         empleadoDto.FechaInicio,
                         empleadoDto.FechaFin,
-                        empleadoDto.MontoPago.Value)
-                    : new SolicitudEmpleado(
-                        empleadoDto.EmpleadoId,
+                        empleadoDto.MontoPago ?? 0,
+                        (TipoPagoEnum)empleadoDto.TipoPago.Value);
+                }
+                else if (empleadoDto.EsExterno)
+                {
+                    solicitudEmpleado = SolicitudEmpleado.CrearExterno(
+                        empleadoDto.NombreExterno!,
                         empleadoDto.FechaInicio,
                         empleadoDto.FechaFin);
-
-                // Hoteles
-                foreach (var hotelDto in empleadoDto.Hoteles)
+                }
+                else
                 {
-                    var hotel = new SolicitudHotel(
-                        hotelDto.ProveedorId,
-                        hotelDto.TipoHabitacionId,
-                        hotelDto.FechaInicio,
-                        hotelDto.FechaFin,
-                        hotelDto.PrecioUnitario);
-
-                    solicitudEmpleado.AgregarHotel(hotel);
+                    solicitudEmpleado = SolicitudEmpleado.CrearInterno(
+                        empleadoDto.EmpleadoId!.Value,
+                        empleadoDto.FechaInicio,
+                        empleadoDto.FechaFin);
                 }
 
-                // Comidas
-                foreach (var comidaDto in empleadoDto.Comidas)
+                if (!esPago)
                 {
-                    var comida = new SolicitudComida(
-                        comidaDto.TipoComidaId,
-                        comidaDto.ProveedorId,
-                        comidaDto.UbicacionId,
-                        comidaDto.FechaInicio,
-                        comidaDto.FechaFin,
-                        comidaDto.PrecioUnitario);
+                    foreach (var hotelDto in empleadoDto.Hoteles)
+                    {
+                        var hotel = new SolicitudHotel(
+                            hotelDto.ProveedorId,
+                            hotelDto.TipoHabitacionId,
+                            hotelDto.FechaInicio,
+                            hotelDto.FechaFin,
+                            hotelDto.PrecioUnitario);
 
-                    solicitudEmpleado.AgregarComida(comida);
+                        solicitudEmpleado.AgregarHotel(hotel);
+                    }
+
+                    foreach (var comidaDto in empleadoDto.Comidas)
+                    {
+                        var comida = new SolicitudComida(
+                            comidaDto.TipoComidaId,
+                            comidaDto.ProveedorId,
+                            comidaDto.UbicacionId,
+                            comidaDto.FechaInicio,
+                            comidaDto.FechaFin,
+                            comidaDto.PrecioUnitario);
+
+                        solicitudEmpleado.AgregarComida(comida);
+                    }
                 }
 
                 solicitud.AgregarEmpleado(solicitudEmpleado);

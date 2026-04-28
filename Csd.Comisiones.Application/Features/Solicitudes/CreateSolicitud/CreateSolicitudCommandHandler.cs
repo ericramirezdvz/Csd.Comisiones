@@ -1,5 +1,6 @@
 ﻿using Csd.Comisiones.Application.Contracts.Persistence;
 using Csd.Comisiones.Domain.Entities;
+using Csd.Comisiones.Domain.Enums;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -34,40 +35,79 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud
 
             foreach (var empleadoDto in request.Empleados)
             {
-                var solicitudEmpleado = empleadoDto.TipoAsignacion == 2 && empleadoDto.MontoPago.HasValue
-                    ? SolicitudEmpleado.CrearPago(
-                        empleadoDto.EmpleadoId,
-                        empleadoDto.FechaInicio,
-                        empleadoDto.FechaFin,
-                        empleadoDto.MontoPago.Value)
-                    : new SolicitudEmpleado(
-                        empleadoDto.EmpleadoId,
-                        empleadoDto.FechaInicio,
-                        empleadoDto.FechaFin);
+                SolicitudEmpleado solicitudEmpleado;
 
-                foreach (var hotelDto in empleadoDto.Hoteles)
+                if (empleadoDto.EsExterno)
                 {
-                    var hotel = new SolicitudHotel(
-                        hotelDto.ProveedorId,
-                        hotelDto.TipoHabitacionId,
-                        hotelDto.FechaInicio,
-                        hotelDto.FechaFin,
-                        hotelDto.PrecioUnitario);
+                    if (string.IsNullOrWhiteSpace(empleadoDto.NombreExterno))
+                        throw new Exception("El nombre del externo es requerido");
 
-                    solicitudEmpleado.AgregarHotel(hotel);
+                    if (empleadoDto.EmpleadoId.HasValue)
+                        throw new Exception("Un externo no debe tener EmpleadoId");
+                }
+                else
+                {
+                    if (!empleadoDto.EmpleadoId.HasValue)
+                        throw new Exception("El empleado es requerido");
                 }
 
-                foreach (var comidaDto in empleadoDto.Comidas)
-                {
-                    var comida = new SolicitudComida(
-                        comidaDto.TipoComidaId,
-                        comidaDto.ProveedorId,
-                        comidaDto.UbicacionId,
-                        comidaDto.FechaInicio,
-                        comidaDto.FechaFin,
-                        comidaDto.PrecioUnitario);
+                var esPago = empleadoDto.TipoAsignacion == (int)TipoAsignacionEnum.Pago;
 
-                    solicitudEmpleado.AgregarComida(comida);
+                if (esPago)
+                {
+                    if (!empleadoDto.MontoPago.HasValue)
+                        throw new Exception("El monto de pago es requerido");
+
+                    solicitudEmpleado = SolicitudEmpleado.CrearPago(
+                        empleadoDto.EmpleadoId,
+                        empleadoDto.NombreExterno,
+                        empleadoDto.EsExterno,
+                        empleadoDto.FechaInicio,
+                        empleadoDto.FechaFin,
+                        empleadoDto.MontoPago.Value,
+                        (TipoPagoEnum)empleadoDto.TipoPago.Value);
+                }
+                else if (empleadoDto.EsExterno)
+                {
+                    solicitudEmpleado = SolicitudEmpleado.CrearExterno(
+                        empleadoDto.NombreExterno!,
+                        empleadoDto.FechaInicio,
+                        empleadoDto.FechaFin);
+                }
+                else
+                {
+                    solicitudEmpleado = SolicitudEmpleado.CrearInterno(
+                        empleadoDto.EmpleadoId!.Value,
+                        empleadoDto.FechaInicio,
+                        empleadoDto.FechaFin);
+                }
+
+                if (!esPago)
+                {
+                    foreach (var hotelDto in empleadoDto.Hoteles)
+                    {
+                        var hotel = new SolicitudHotel(
+                            hotelDto.ProveedorId,
+                            hotelDto.TipoHabitacionId,
+                            hotelDto.FechaInicio,
+                            hotelDto.FechaFin,
+                            hotelDto.PrecioUnitario);
+
+                        solicitudEmpleado.AgregarHotel(hotel);
+                    }
+
+                    foreach (var comidaDto in empleadoDto.Comidas)
+                    {
+                        var comida = new SolicitudComida(
+                            comidaDto.TipoComidaId,
+                            comidaDto.ProveedorId,
+                            comidaDto.UbicacionId,
+                            comidaDto.FechaInicio,
+                            comidaDto.FechaFin,
+                            comidaDto.PrecioUnitario);
+
+                        solicitudEmpleado.AgregarComida(comida);
+                    }
                 }
 
                 solicitud.AgregarEmpleado(solicitudEmpleado);

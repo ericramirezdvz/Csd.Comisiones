@@ -80,8 +80,22 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
                 })
                 .ToDictionaryAsync(x => x.TipoServicio, x => x.PrecioMaximo, cancellationToken);
 
-            decimal GetPrecioMax(TipoServicioEnum tipoServicio) =>
-            preciosMaximos.TryGetValue(tipoServicio, out var precio) ? precio : 0;
+            decimal GetPrecioMax(TipoServicioEnum tipoServicio) {
+                // Solo para hospedaje en Carmen
+                if (solicitud.CiudadId == 1 &&
+                    (tipoServicio == TipoServicioEnum.HabitacionSencilla ||
+                     tipoServicio == TipoServicioEnum.HabitacionDoble))
+                {
+                    return _context.ProveedorServicio
+                        .Where(x => x.ProveedorId == 5 && x.TipoServicio == tipoServicio)
+                        .Select(x => x.Precio)
+                        .FirstOrDefault();
+                }
+
+                return preciosMaximos.TryGetValue(tipoServicio, out var precio)
+                    ? precio
+                    : 0;
+            }
 
             // Determinar tipos de servicio desde metadata en comentarios
             var comentarios = solicitud.Comentarios ?? "";

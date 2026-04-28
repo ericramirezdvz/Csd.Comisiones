@@ -48,7 +48,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById
 
                     Empleados = s.Empleados.Select(e => new EmpleadoSolicitudDto
                     {
-                        EmpleadoId = e.EmpleadoId,
+                        EmpleadoId = e.EmpleadoId.HasValue ? e.EmpleadoId.Value : 0,
                         NombreCompleto = e.Empleado.NombreCompleto,
                         NumeroEmpleado = e.Empleado.NumeroEmpleado,
                         AreaId = e.Empleado.AreaId,

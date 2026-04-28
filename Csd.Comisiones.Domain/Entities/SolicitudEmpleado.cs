@@ -12,11 +12,13 @@ namespace Csd.Comisiones.Domain.Entities
     {
         public int SolicitudEmpleadoId { get; private set; }
         public int SolicitudId { get; private set; }
-        public int EmpleadoId { get; private set; }
-
+        public int? EmpleadoId { get; private set; }
+        public string? NombreExterno { get; private set; }
+        public bool EsExterno { get; private set; }
         public DateTime FechaInicio { get; private set; }
         public DateTime FechaFin { get; private set; }
         public TipoAsignacionEnum TipoAsignacion { get; private set; }
+        public TipoPagoEnum? TipoPago { get; private set; }
         public decimal? MontoPago { get; private set; }
         public Solicitud Solicitud { get; private set; } = null!;
         public Empleado Empleado { get; set; } = null!;
@@ -60,10 +62,13 @@ namespace Csd.Comisiones.Domain.Entities
         }
 
         public static SolicitudEmpleado CrearPago(
-        int empleadoId,
+        int? empleadoId,
+        string? nombreExterno,
+        bool esExterno,
         DateTime fechaInicio,
         DateTime fechaFin,
-        decimal monto)
+        decimal monto,
+        TipoPagoEnum tipoPago)
         {
             if (fechaFin < fechaInicio)
                 throw new ArgumentException("La fecha fin no puede ser menor a la fecha inicio.");
@@ -71,13 +76,20 @@ namespace Csd.Comisiones.Domain.Entities
             if (monto <= 0)
                 throw new ArgumentException("El monto debe ser mayor a 0");
 
+            if (esExterno && string.IsNullOrWhiteSpace(nombreExterno))
+                throw new ArgumentException("El nombre del externo es requerido");
+
+            if (!esExterno && !empleadoId.HasValue)
+                throw new ArgumentException("El empleado es requerido");
+
             return new SolicitudEmpleado
             {
                 EmpleadoId = empleadoId,
                 FechaInicio = fechaInicio,
                 FechaFin = fechaFin,
                 TipoAsignacion = TipoAsignacionEnum.Pago,
-                MontoPago = monto
+                MontoPago = monto,
+                TipoPago = tipoPago
             };
         }
 
@@ -104,5 +116,41 @@ namespace Csd.Comisiones.Domain.Entities
             TipoAsignacion = TipoAsignacionEnum.Servicios;
             MontoPago = null;
         }
+
+        public static SolicitudEmpleado CrearInterno(
+        int empleadoId,
+        DateTime fechaInicio,
+        DateTime fechaFin)
+        {
+            if (empleadoId <= 0)
+                throw new ArgumentException("El empleado es requerido");
+
+            return new SolicitudEmpleado
+            {
+                EmpleadoId = empleadoId,
+                EsExterno = false,
+                FechaInicio = fechaInicio,
+                FechaFin = fechaFin
+            };
+        }
+
+        public static SolicitudEmpleado CrearExterno(
+        string nombreExterno,
+        DateTime fechaInicio,
+        DateTime fechaFin)
+        {
+            if (string.IsNullOrWhiteSpace(nombreExterno))
+                throw new ArgumentException("El nombre del externo es requerido");
+
+            return new SolicitudEmpleado
+            {
+                NombreExterno = nombreExterno,
+                EsExterno = true,
+                FechaInicio = fechaInicio,
+                FechaFin = fechaFin
+            };
+        }
+
+
     }
 }
