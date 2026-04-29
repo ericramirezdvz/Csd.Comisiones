@@ -129,7 +129,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
                 {
                     return new EmpleadoEmailDto
                     {
-                        Nombre = e.Empleado.NombreCompleto,
+                        Nombre = e.EsExterno ? (e.NombreExterno ?? "Externo") : (e.Empleado?.NombreCompleto ?? "Sin nombre"),
                         FechaInicio = e.FechaInicio,
                         FechaFin = e.FechaFin,
                         RequiereHotel = false,
@@ -209,7 +209,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.SendSolicitud
 
                 return new EmpleadoEmailDto
                 {
-                    Nombre = e.Empleado.NombreCompleto,
+                    Nombre = e.EsExterno ? (e.NombreExterno ?? "Externo") : (e.Empleado?.NombreCompleto ?? "Sin nombre"),
                     FechaInicio = e.FechaInicio,
                     FechaFin = e.FechaFin,
 

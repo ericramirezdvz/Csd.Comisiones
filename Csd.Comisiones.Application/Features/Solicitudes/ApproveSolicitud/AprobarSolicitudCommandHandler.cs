@@ -88,7 +88,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.ApproveSolicitud
                     {
                         return new EmpleadoEmailDto
                         {
-                            Nombre = e.Empleado.NombreCompleto,
+                            Nombre = e.EsExterno ? (e.NombreExterno ?? "Externo") : (e.Empleado?.NombreCompleto ?? "Sin nombre"),
                             FechaInicio = e.FechaInicio,
                             FechaFin = e.FechaFin,
                             RequiereHotel = false,
@@ -137,7 +137,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.ApproveSolicitud
 
                     return new EmpleadoEmailDto
                     {
-                        Nombre = e.Empleado.NombreCompleto,
+                        Nombre = e.EsExterno ? (e.NombreExterno ?? "Externo") : (e.Empleado?.NombreCompleto ?? "Sin nombre"),
                         FechaInicio = e.FechaInicio,
                         FechaFin = e.FechaFin,
                         RequiereHotel = requiereHotel,
@@ -156,6 +156,15 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.ApproveSolicitud
                 solicitud.FechaInicio,
                 solicitud.FechaFin,
                 empleadosEmail
+            );
+
+            // Notificar al solicitante que la comisión está en proceso
+            await _emailService.SendComisionEnProcesoAsync(
+                correoSolicitante,
+                solicitud.Folio,
+                solicitud.ObraId.ToString(),
+                solicitud.FechaInicio,
+                solicitud.FechaFin
             );
 
             return true;

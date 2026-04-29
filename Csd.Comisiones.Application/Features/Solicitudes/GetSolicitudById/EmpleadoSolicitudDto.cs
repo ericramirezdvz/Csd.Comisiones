@@ -16,6 +16,9 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.GetSolicitudById
         public string? Correo { get; set; }
         public int TipoAsignacion { get; set; } // 1=Servicios, 2=Pago
         public decimal? MontoPago { get; set; }
+        public int? TipoPago { get; set; } // 1=14x14 Costa afuera, 2=30x0 Tierra
+        public bool EsExterno { get; set; }
+        public string? NombreExterno { get; set; }
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
 

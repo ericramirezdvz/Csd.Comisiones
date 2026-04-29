@@ -55,8 +55,8 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud
 
                 if (esPago)
                 {
-                    if (!empleadoDto.MontoPago.HasValue)
-                        throw new Exception("El monto de pago es requerido");
+                    if (!empleadoDto.TipoPago.HasValue)
+                        throw new Exception("El tipo de pago es requerido");
 
                     solicitudEmpleado = SolicitudEmpleado.CrearPago(
                         empleadoDto.EmpleadoId,
@@ -64,7 +64,7 @@ namespace Csd.Comisiones.Application.Features.Solicitudes.CreateSolicitud
                         empleadoDto.EsExterno,
                         empleadoDto.FechaInicio,
                         empleadoDto.FechaFin,
-                        empleadoDto.MontoPago.Value,
+                        empleadoDto.MontoPago ?? 0,
                         (TipoPagoEnum)empleadoDto.TipoPago.Value);
                 }
                 else if (empleadoDto.EsExterno)

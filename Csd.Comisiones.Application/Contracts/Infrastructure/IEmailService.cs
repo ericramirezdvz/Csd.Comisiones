@@ -44,7 +44,8 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
             string subFolio,
             List<ProveedorDetalleDto> detalles,
             Guid token,
-            bool esConciliacion = false);
+            bool esConciliacion = false,
+            string? ccCorreo = null);
 
         Task SendProveedorRechazoNotificacionAsync(
             string folio,
@@ -76,6 +77,40 @@ namespace Csd.Comisiones.Application.Contracts.Infrastructure
             string empleadoNombre,
             List<ProveedorDetalleDto> eliminados,
             List<ProveedorDetalleDto> vigentes,
-            Guid token);
+            Guid token,
+            string? ccCorreo = null);
+
+        /// <summary>
+        /// Notifica a CH que un proveedor aceptó los servicios.
+        /// </summary>
+        Task SendProveedorAceptacionNotificacionAsync(
+            string folio,
+            string proveedorNombre);
+
+        /// <summary>
+        /// Notifica a CH que todos los proveedores de una solicitud confirmaron.
+        /// </summary>
+        Task SendTodosProveedoresConfirmadosAsync(
+            string folio);
+
+        /// <summary>
+        /// Notifica al solicitante que su comisión pasó a EN_PROCESO.
+        /// </summary>
+        Task SendComisionEnProcesoAsync(
+            string correo,
+            string folio,
+            string obra,
+            DateTime fechaInicio,
+            DateTime fechaFin);
+
+        /// <summary>
+        /// Notifica al solicitante que su comisión fue completada (checkout).
+        /// </summary>
+        Task SendComisionTerminadaAsync(
+            string correo,
+            string folio,
+            string obra,
+            DateTime fechaInicio,
+            DateTime fechaFin);
     }
 }
